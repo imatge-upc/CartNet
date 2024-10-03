@@ -1,11 +1,16 @@
+"""
+Original implementation from
+https://github.com/divelab/AIRS/blob/main/OpenMat/ComFormer
+
+modified to add temperature
+
+"""
+
+
 import torch
 from torch import nn
 from network.transformer import ComformerConv, ComformerConv_edge, ComformerConvEqui
 from models.cartnet import Cholesky_head
-
-
-# Modified implementation from Comfomer
-# https://github.com/divelab/AIRS/tree/main/OpenMat/ComFormer
 
 
 def bond_cosine(r1, r2):

@@ -4,14 +4,12 @@ import time
 import numpy as np
 import torch
 from scipy import stats
-from sklearn.metrics import mean_absolute_error, mean_squared_error
 
 from sklearn.metrics import r2_score
 from torch_geometric.graphgym import get_current_gpu_usage
 from torch_geometric.graphgym.config import cfg
-from torch_geometric.graphgym.logger import infer_task, Logger
+from torch_geometric.graphgym.logger import  Logger
 from torch_geometric.graphgym.utils.io import dict_to_json
-from sklearn.exceptions import UndefinedMetricWarning
 
 def warn(*args, **kwargs):
     pass
@@ -22,14 +20,11 @@ warnings.warn = warn
 class CustomLogger(Logger):
     def __init__(self,*args, **kwargs, ):
         super().__init__(*args, **kwargs)
-        self._size_current_ellipse = 0
-    #     # Whether to run comparison tests of alternative score implementations.
-    #     self.test_scores = False
+
 
     def reset(self):
         self._iter = 0
         self._size_current = 0
-        self._size_current_ellipse = 0
         self._loss = 0
         self._lr = 0
         self._params = 0
@@ -53,101 +48,27 @@ class CustomLogger(Logger):
         return stats
 
 
-    def mae_mape_per_class(self, pred, true, classes):
-        """
-        Compute the Mean Absolute Error (MAE) and Mean Percentage Absolute Error (MAPE) per class and then average between classes.
-
-        Args:
-        pred (torch.Tensor): Predicted values tensor.
-        true (torch.Tensor): Ground truth values tensor.
-        classes (torch.Tensor): Class labels tensor.
-
-        Returns:
-        float: Averaged MAE between classes.
-        """
-        # Calculate the absolute errors
-        abs_errors = torch.abs(pred - true)
-
-        #Calculate percentage errors
-        percent_errors = abs_errors/(true+1e-8)
-
-        # Get unique classes and their counts
-        unique_classes, counts = classes.unique(return_counts=True)
-
-        # Initialize a tensor to accumulate the sum of absolute errors per class
-        abs_error_sums = torch.zeros_like(unique_classes, dtype=torch.float)
-
-        # Initialize a tensor to accumulate the sum of percentage errors per class
-        percent_error_sums = torch.zeros_like(unique_classes, dtype=torch.float)
-
-        # Accumulate the absolute errors per class using scatter_add
-        abs_error_sums.scatter_add_(0, classes, abs_errors)
-
-        # Accumulate the percentage errors per class using scatter_add
-        percent_error_sums.scatter_add_(0, classes, percent_errors)
-
-        # Calculate the mean absolute error per class
-        mae_per_class = abs_error_sums / counts.float()
-
-        # Calculate the mean absolute percentage error per class
-        mape_per_class = percent_error_sums / counts.float()
-
-        # Calculate the average MAE across classes
-        avg_mae = mae_per_class.mean()
-
-        # Calculate the average MAPE across classes
-        avg_mape = mape_per_class.mean()
-
-        return avg_mae.item(), avg_mape.item()
-
     def regression(self):
-        batch_size = 1e6
         true, pred = torch.cat(self._true), torch.cat(self._pred)
         reformat = lambda x: float(x)
-        if len(self._class):
-            classes = torch.cat(self._class)
-            avg_mae_per_class, avg_mape_per_class = self.mae_mape_per_class(pred, true, classes)
-            return {
-                'r2': reformat(eval_r2(true.numpy(), pred.numpy())),
-                'spearmanr': reformat(eval_spearmanr(true.numpy(),
-                                                    pred.numpy())['spearmanr']),
-                "MAE_per_class": avg_mae_per_class,
-                "MAPE_per_class": avg_mape_per_class,
-            
-            }
-
-            
-
-        print(true.dtype)
-        print("True")
-        print(true[0])
-        print("Pred")
-        print(pred[0])
         
-        try:
-            return {
-                'r2': reformat(eval_r2(true.numpy(), pred.numpy())),
-                'spearmanr': reformat(eval_spearmanr(true.numpy(),
-                                                    pred.numpy())['spearmanr']),
-            
-            }
-        except:
-            return {}
+        return {
+            'r2': reformat(eval_r2(true.numpy(), pred.numpy())),
+            'spearmanr': reformat(true.numpy(),
+                                pred.numpy()),
+        }
         
     def custom(self):
         if len(self._custom_stats) == 0:
             return {}
         out = {}
         for key, val in self._custom_stats.items():
-            if key in ["loss_ellipse", "volume_percentage_error"] and self._size_current_ellipse>0:
-                out[key] = val / self._size_current_ellipse
-            else:
-                out[key] = val / self._size_current
+            out[key] = val / self._size_current
         return out
 
 
     def update_stats(self, true, pred, loss, lr, time_used, params,
-                     dataset_name=None, classes=None, batch_ellipse=None, **kwargs):
+                     dataset_name=None, classes=None, **kwargs):
         
         assert true.shape == pred.shape, (true.shape, pred.shape)
         batch_size = true.shape[0]
@@ -162,19 +83,11 @@ class CustomLogger(Logger):
         self._params = params
         self._time_used += time_used
         self._time_total += time_used
-        if batch_ellipse is not None:
-            self._size_current_ellipse += batch_ellipse
         for key, val in kwargs.items():
-            if batch_ellipse is not None and key in ["loss_ellipse", "volume_percentage_error"]:
-                if key not in self._custom_stats:
-                    self._custom_stats[key] = val * batch_ellipse
-                else:
-                    self._custom_stats[key] += val * batch_ellipse
+            if key not in self._custom_stats:
+                self._custom_stats[key] = val * batch_size
             else:
-                if key not in self._custom_stats:
-                    self._custom_stats[key] = val * batch_size
-                else:
-                    self._custom_stats[key] += val * batch_size
+                self._custom_stats[key] += val * batch_size
 
     def write_epoch(self, cur_epoch):
         start_time = time.perf_counter()
@@ -256,14 +169,12 @@ def eval_spearmanr(y_true, y_pred):
             res_list.append(stats.spearmanr(y_true[is_labeled, i],
                                             y_pred[is_labeled, i])[0])
 
-    return {'spearmanr': sum(res_list) / len(res_list)}
+    return sum(res_list) / len(res_list)
 
 def eval_r2(y_true, y_pred):
     """Compute Spearman Rho averaged across tasks.
     """
     res_list = []
-    print(y_true.shape)
-    print(y_pred.shape)
 
     if y_true.ndim == 1:
         res_list.append(r2_score(y_true, y_pred, multioutput='uniform_average'))

@@ -1,3 +1,9 @@
+"""
+Original implementation from
+https://github.com/divelab/AIRS/blob/main/OpenMat/ComFormer
+
+"""
+
 import math
 from e3nn import o3
 from typing import Optional, Tuple, Union

@@ -7,6 +7,43 @@ from torch_scatter import scatter
 from models.utils import ExpNormalSmearing, CosineCutoff
 
 
+class CartNet(torch.nn.Module):
+    """
+    CartNet's architecture. 
+    From "CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation"
+
+    """
+
+    def __init__(self, dim_in, num_layers, invariant=False, temperature=True, use_envelope=True, cholesky=True):
+        super().__init__()
+    
+        self.encoder = Encoder(dim_in, invariant=invariant, temperature=temperature)
+        self.dim_in = dim_in
+
+        layers = []
+        for _ in range(num_layers):
+            layers.append(CartNet_layer(
+                dim_in=dim_in,
+                out_dim=dim_in,
+                use_envelope=use_envelope,
+            ))
+        self.layers = torch.nn.Sequential(*layers)
+
+        if cholesky:
+            self.head = Cholesky_head(dim_in)
+        else:
+            self.head = Scalar_head(dim_in)
+        
+    def forward(self, batch):
+        batch = self.encoder(batch)
+
+        for layer in self.layers:
+            batch = layer(batch)
+        
+        pred, true = self.head(batch)
+        
+        return pred,true
+
 class Encoder(torch.nn.Module):
     """
     Atom and Edge encoder from CartNet
@@ -57,9 +94,9 @@ class Encoder(torch.nn.Module):
         batch.x = self.encoder_atom(x)
 
         if cfg.invariant:
-            batch.edge_attr = self.encoder_edge(self.rbf(batch.cart_dist.squeeze(-1)))
+            batch.edge_attr = self.encoder_edge(self.rbf(batch.cart_dist))
         else:
-            batch.edge_attr = self.encoder_edge(torch.cat([self.rbf(batch.cart_dist.squeeze(-1)), batch.cart_dir], dim=-1))
+            batch.edge_attr = self.encoder_edge(torch.cat([self.rbf(batch.cart_dist), batch.cart_dir], dim=-1))
 
         return batch
 
@@ -68,7 +105,7 @@ class CartNet_layer(pyg_nn.conv.MessagePassing):
     CartNet layer
     """
     
-    def __init__(self, in_dim, out_dim, use_cutoff=True):
+    def __init__(self, in_dim, out_dim, use_envelope=True):
         super().__init__()
         self.in_dim = in_dim
         self.out_dim = out_dim
@@ -86,8 +123,8 @@ class CartNet_layer(pyg_nn.conv.MessagePassing):
         
         self.norm = nn.BatchNorm1d(in_dim)
         self.norm2 = nn.BatchNorm1d(in_dim)
-        self.use_cutoff = use_cutoff
-        self.cutoff = CosineCutoff(0, cfg.cutoff)
+        self.use_envelope = use_envelope
+        self.envelope = CosineCutoff(0, cfg.radius)
         
 
     def forward(self, batch):
@@ -126,8 +163,8 @@ class CartNet_layer(pyg_nn.conv.MessagePassing):
         e_ij = self.MLP_gate(torch.cat([Xx_i, Xx_j, Ee], dim=-1))
         e_ij = F.sigmoid(self.norm(e_ij))
         
-        if self.use_cutoff:
-            sigma_ij = self.cutoff(He)*e_ij
+        if self.use_envelope:
+            sigma_ij = self.envelope(He)*e_ij
         else:
             sigma_ij = e_ij
         
@@ -178,7 +215,7 @@ class Cholesky_head(torch.nn.Module):
         diag_elements = F.softplus(pred[:, :3])
 
         i,j = torch.tensor([0,1,2,0,0,1]), torch.tensor([0,1,2,1,2,2])
-        L_matrix = torch.empty(pred.size(0),3,3, device=pred.device)
+        L_matrix = torch.zeros(pred.size(0),3,3, device=pred.device)
         L_matrix[:,i[:3], i[:3]] = diag_elements
         L_matrix[:,i[3:], j[3:]] = pred[:,3:]
 
@@ -203,39 +240,3 @@ class Scalar_head(torch.nn.Module):
         batch.x = scatter(batch.x, batch.batch, dim=0, reduce="mean", dim_size=dim_size).squeeze(-1)
         return batch.x, batch.y
 
-class CartNet(torch.nn.Module):
-    """
-    CartNet's architecture. 
-    From "CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation"
-
-    """
-
-    def __init__(self, dim_in, num_layers, atomref=None, invariant=False, temperature=True, use_cutoff=True, cholesky=True):
-        super().__init__()
-    
-        self.encoder = Encoder(dim_in, invariant=invariant, temperature=temperature)
-        self.dim_in = dim_in
-
-        layers = []
-        for _ in range(num_layers):
-            layers.append(CartNet_layer(
-                dim_in=dim_in,
-                out_dim=dim_in,
-                use_cutoff=use_cutoff,
-            ))
-        self.layers = torch.nn.Sequential(*layers)
-
-        if cholesky:
-            self.head = Cholesky_head(dim_in)
-        else:
-            self.head = Scalar_head(dim_in)
-        
-    def forward(self, batch):
-        batch = self.encoder(batch)
-
-        for layer in self.layers:
-            batch = layer(batch)
-        
-        pred, true = self.head(batch)
-        
-        return pred,true
