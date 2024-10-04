@@ -1,6 +1,8 @@
 import torch
+import math
 from torch import nn, Tensor
 import torch.nn.functional as F
+from typing import Optional
 
 # Implementation from TensorNet
 # https://github.com/torchmd/torchmd-net

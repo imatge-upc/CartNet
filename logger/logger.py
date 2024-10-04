@@ -50,12 +50,11 @@ class CustomLogger(Logger):
 
     def regression(self):
         true, pred = torch.cat(self._true), torch.cat(self._pred)
-        reformat = lambda x: float(x)
         
         return {
-            'r2': reformat(eval_r2(true.numpy(), pred.numpy())),
-            'spearmanr': reformat(true.numpy(),
-                                pred.numpy()),
+            'r2': float(eval_r2(true.numpy(), pred.numpy())),
+            'spearmanr': float(eval_spearmanr(true.numpy(),
+                                pred.numpy())),
         }
         
     def custom(self):

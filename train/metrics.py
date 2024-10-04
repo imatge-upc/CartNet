@@ -81,40 +81,40 @@ def compute_3D_IoU(pred,true):
 
     return iou
 
-def compute_metrics_and_logging(pred, true, mae, mse, loss, lr, time_used, logger, test_metrics=False):
+def compute_metrics_and_logging(pred, true, mae, mse, loss, volume_percentage_error, lr, time_used, logger, iou=None):
     
     if cfg.dataset.name == "ADP":
-        if test_metrics:
+        if iou is not None:
             logger.update_stats(true = true,
                                 pred = pred,
                                 loss = loss.mean().item(),
-                                MAE = MAE.mean().item(),
-                                MSE = MSE.mean().item(),
+                                MAE = mae.mean().item(),
+                                MSE = mse.mean().item(),
                                 lr = lr,
                                 time_used = time_used,
                                 params = cfg.params_count,
                                 dataset_name = cfg.dataset.name,
-                                volume_percentage_error = get_error_volume(pred, true).mean().item(),
-                                iou = compute_3D_IoU(pred, true).mean().item()
+                                volume_percentage_error = volume_percentage_error.mean().item(),
+                                iou = iou.mean().item()
                             )
         else:
             logger.update_stats(true = true,
                             pred = pred,
                             loss = loss.mean().item(),
-                            MAE = MAE.mean().item(),
-                            MSE = MSE.mean().item(),
-                            lr =,
+                            MAE = mae.mean().item(),
+                            MSE = mse.mean().item(),
+                            lr = lr,
+                            volume_percentage_error = volume_percentage_error.mean().item(),
                             time_used = time_used,
                             params = cfg.params_count,
                             dataset_name = cfg.dataset.name,
-                            volume_percentage_error = get_error_volume(pred, true).mean().item()
                         )
     else:
         logger.update_stats(true = true,
                             pred = pred,
                             loss = loss.mean().item(),
-                            MAE = MAE.mean().item(),
-                            MSE = MSE.mean().item(),
+                            MAE = mae.mean().item(),
+                            MSE = mse.mean().item(),
                             lr = lr,
                             time_used = time_used,
                             params = cfg.params_count,

@@ -23,7 +23,7 @@ class DatasetADP(Dataset):
         with open(file_names, 'r') as file:
             self.file_names = [line.strip() for line in file.readlines()]
 
-        super(DatasetPBC, self).__init__(self.original_root, None, None)
+        super(DatasetADP, self).__init__(self.original_root, None, None)
     def len(self):
         return len(self.file_names)
     
@@ -73,10 +73,6 @@ class DatasetADP(Dataset):
             data.edge_attr = data.edge_attr[bool_mask_combined, :]
             data.non_H_mask = torch.ones(data.x.shape[0], dtype=torch.bool)
         
-
-
-        data.cart_dist = data.edge_attr[:,-1]
-        data.cart_dir = data.edge_attr[:,:-1]
     
         if self.optimize_cell:
             data.cell_og = data.cell

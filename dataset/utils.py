@@ -465,7 +465,7 @@ def compute_knn(max_neigh, radius, path, refcodes):
     
     for split in refcodes:
         with open(split, 'r') as file:
-        file_names = [line.strip() for line in file.readlines()]
+            file_names = [line.strip() for line in file.readlines()]
         for file_name in tqdm(file_names, ncols=50, desc="Computing PBC"):
             data = torch.load(osp.join(original_root,file_name+".pt"))
             

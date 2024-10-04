@@ -32,7 +32,7 @@ class Figshare_Dataset(InMemoryDataset):
         pass
     
 
-     def get(self, idx):
+    def get(self, idx):
         data = super().get(idx)
         
         if self.augment:

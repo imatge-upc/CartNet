@@ -77,11 +77,12 @@ if __name__ == "__main__":
     parser.add_argument("--dataset", type=str, default="ADP", help="Dataset name. Available: ADP, Jarvis, MaterialsProject")
     parser.add_argument("--dataset_path", type=str, default="./dataset/ADP_DATASET/")
     parser.add_argument("--inference", action="store_true", help="Inference")
+    parser.add_argument("--montecarlo", action="store_true", help="Montecarlo")
     parser.add_argument("--weighs_path", type=str, default=None, help="Path to the weights of the model")
     parser.add_argument("--inference_output", type=str, default="./inference.pkl", help="Path to the inference output")
     parser.add_argument("--figshare_target", type=str, default="formation_energy_peratom", help="Figshare dataset target")
     parser.add_argument("--wandb_project", type=str, default="ADP", help="Wandb project name")
-    parser.add_argument("--wandb_entity", type=str, default="aiquaneuro", help="Name of the wand entity")
+    parser.add_argument("--wandb_entity", type=str, default="aiquaneuro", help="Name of the wandb entity")
     parser.add_argument("--loss", type=str, default="MAE", help="Loss function")
     parser.add_argument("--epochs", type=int, default=50, help="Number of epochs")
     parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate")
@@ -91,7 +92,7 @@ if __name__ == "__main__":
     parser.add_argument("--radius", type=float, default=5.0, help="Radius for the Radius Graph Neighbourhood")
     parser.add_argument("--num_layers", type=int, default=4, help="Number of layers")
     parser.add_argument("--dim_in", type=int, default=256, help="Input dimension")
-    parser.add_argument("--num_rbf", type=int, default=64, help="Number of RBF")
+    parser.add_argument("--dim_rbf", type=int, default=64, help="Number of RBF")
     parser.add_argument('--augment', action='store_true', help='Hydrogens')
     parser.add_argument("--invariant", action="store_true", help="Rotation Invariant model")
     parser.add_argument("--disable_temp", action="store_false", help="Disable Temperature")
@@ -103,16 +104,14 @@ if __name__ == "__main__":
     set_cfg(cfg)
 
     args, _ = parser.parse_known_args()
-    cfg.seed = args.seed
     cfg.seed = cfg.seed
+    cfg.name = args.name
     cfg.run_dir = "results/"+cfg.name+"/"+str(cfg.seed)
     cfg.dataset.task_type = "regression"
-    cfg.name = args.name
     cfg.batch = args.batch
     cfg.batch_accumulation = args.batch_accumulation
-    cfg.dataset = args.dataset
+    cfg.dataset.name = args.dataset
     cfg.dataset_path = args.dataset_path
-    cfg.figshare_name = args.figshare_name
     cfg.figshare_target = args.figshare_target
     cfg.wandb_project = args.wandb_project
     cfg.wandb_entity = args.wandb_entity
@@ -125,10 +124,10 @@ if __name__ == "__main__":
     cfg.radius = args.radius
     cfg.num_layers = args.num_layers
     cfg.dim_in = args.dim_in
-    cfg.num_rbf = args.num_rbf
+    cfg.dim_rbf = args.dim_rbf
     cfg.augment = False if cfg.model in ["icomformer", "ecomformer"] else args.augment
     cfg.invariant = args.invariant
-    cfg.use_temp = False if dataset != "ADP" else args.disable_temp
+    cfg.use_temp = False if cfg.dataset.name != "ADP" else args.disable_temp
     cfg.standarize_temp = args.no_standarize_temp
     cfg.envelope = args.disable_envelope
     cfg.use_H = args.disable_H

@@ -16,14 +16,14 @@ def create_loader():
     """
     if cfg.dataset.name == "ADP":
         refcodes = [osp.join(cfg.dataset_path,"train_files.csv"), osp.join(cfg.dataset_path,"val_files.csv"), osp.join(cfg.dataset_path,"test_files.csv")]
-        if cfg.model_name in ["icomformer", "ecomformer"]:
+        if cfg.model in ["icomformer", "ecomformer"]:
             assert cfg.max_neighbours is not None, "max_neighbours are needed for e/iComformer"
             cfg.dataset_path = compute_knn(cfg.max_neighbours, cfg.radius, cfg.path, refcodes)
 
-        optimize_cell = True if cfg.model_name == "icomformer" else False
-        dataset_train, dataset_val, dataset_test = (DatasetADP(root=osp.join(cfg.dataset_path, "data/"), file_names=refcodes[0], Hydrogens=cfg.use_H, standarize_temp = cfg.standarize_temp, augment=cfg.augment, optimize_cell=optimize_cell),
-                                                    DatasetADP(root=osp.join(cfg.dataset_path, "data/"), file_names=refcodes[1], Hydrogens=cfg.use_H, standarize_temp = cfg.standarize_temp, optimize_cell=optimize_cell),
-                                                    DatasetADP(root=osp.join(cfg.dataset_path, "data/"), file_names=refcodes[2], Hydrogens=cfg.use_H, standarize_temp = cfg.standarize_temp, optimize_cell=optimize_cell) 
+        optimize_cell = True if cfg.model == "icomformer" else False
+        dataset_train, dataset_val, dataset_test = (DatasetADP(root=osp.join(cfg.dataset_path, "data/"), file_names=refcodes[0], hydrogens=cfg.use_H, standarize_temp = cfg.standarize_temp, augment=cfg.augment, optimize_cell=optimize_cell),
+                                                    DatasetADP(root=osp.join(cfg.dataset_path, "data/"), file_names=refcodes[1], hydrogens=cfg.use_H, standarize_temp = cfg.standarize_temp, optimize_cell=optimize_cell),
+                                                    DatasetADP(root=osp.join(cfg.dataset_path, "data/"), file_names=refcodes[2], hydrogens=cfg.use_H, standarize_temp = cfg.standarize_temp, optimize_cell=optimize_cell) 
                                                 )
     elif cfg.dataset.name == "jarvis" or cfg.dataset.name=="megnet":
         from jarvis.db.figshare import data as jdata
@@ -41,13 +41,20 @@ def create_loader():
             import pickle as pk
             target = cfg.jarvis_target
             if cfg.jarvis_target == "bulk modulus":
-                data_train = pk.load(open("./dataset/megnet/bulk_megnet_train.pkl", "rb"))
-                data_val = pk.load(open("./dataset/megnet/bulk_megnet_val.pkl", "rb"))
-                data_test = pk.load(open("./dataset/megnet/bulk_megnet_test.pkl", "rb"))
+                try:
+                    data_train = pk.load(open("./dataset/megnet/bulk_megnet_train.pkl", "rb"))
+                    data_val = pk.load(open("./dataset/megnet/bulk_megnet_val.pkl", "rb"))
+                    data_test = pk.load(open("./dataset/megnet/bulk_megnet_test.pkl", "rb"))
+                except:
+                    raise Exception("Bulk modulus dataset not found, please download it from https://figshare.com/projects/Bulk_and_shear_datasets/165430")
             elif cfg.jarvis_target == "shear modulus":
-                data_train = pk.load(open("./dataset/megnet/shear_megnet_train.pkl", "rb"))
-                data_val = pk.load(open("./dataset/megnet/shear_megnet_val.pkl", "rb"))
-                data_test = pk.load(open("./dataset/megnet/shear_megnet_test.pkl", "rb"))
+                try:
+                    data_train = pk.load(open("./dataset/megnet/shear_megnet_train.pkl", "rb"))
+                    data_val = pk.load(open("./dataset/megnet/shear_megnet_val.pkl", "rb"))
+                    data_test = pk.load(open("./dataset/megnet/shear_megnet_test.pkl", "rb"))
+                except:
+                    raise Exception("Shear modulus dataset not found, please download it from https://figshare.com/projects/Bulk_and_shear_datasets/165430")
+            
             targets_train = []
             dat_train = []
             targets_val = []
