@@ -41,7 +41,7 @@ def train(model, loaders, optimizer, loggers):
     """
 
     
-    run = wandb.init(entity="aiquaneuro", project=cfg.wandb_project,
+    run = wandb.init(entity=cfg.wandb_entity, project=cfg.wandb_project,
                     name=cfg.name)
     
 

@@ -64,7 +64,7 @@ class Encoder(torch.nn.Module):
             self.temperature_proj_atom = pyg_nn.Linear(1, self.dim_in*2, bias=True)
         else:
             self.bias = nn.Parameter(torch.zeros(self.dim_in*2))
-        self.activation = nn.SiLU()
+        self.activation = nn.SiLU(inplace=True)
         
        
         self.encoder_atom = nn.Sequential(self.activation,
@@ -109,7 +109,7 @@ class CartNet_layer(pyg_nn.conv.MessagePassing):
         super().__init__()
         self.in_dim = in_dim
         self.out_dim = out_dim
-        self.activation = nn.SiLU() 
+        self.activation = nn.SiLU(inplace=True) 
         self.MLP_aggr = nn.Sequential(
             pyg_nn.Linear(in_dim*3, in_dim, bias=True),
             self.activation,
@@ -206,7 +206,7 @@ class Cholesky_head(torch.nn.Module):
     def __init__(self, dim_in):
         super(Cholesky_head, self).__init__()
         self.MLP = nn.Sequential(pyg_nn.Linear(dim_in, dim_in//2),
-                                nn.SiLU(), 
+                                nn.SiLU(inplace=True), 
                                 pyg_nn.Linear(dim_in//2, 6))
 
     def forward(self, batch):
@@ -231,7 +231,7 @@ class Scalar_head(torch.nn.Module):
         super(Scalar_head, self).__init__()
 
         self.MLP = nn.Sequential(pyg_nn.Linear(dim_in, dim_in//2), 
-                                nn.SiLU(), 
+                                nn.SiLU(inplace=True), 
                                 pyg_nn.Linear(dim_in//2, 1))
 
     def forward(self, batch):
