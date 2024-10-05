@@ -6,7 +6,7 @@ import numpy as np
 from logger.logger import create_logger
 from loader.loader import create_loader
 from models.master import create_model
-from train.train import train
+from train.train_irene import train
 from torch_geometric.graphgym.utils.comp_budget import params_count
 from torch_geometric import seed_everything
 from torch_geometric.graphgym.config import cfg, set_cfg

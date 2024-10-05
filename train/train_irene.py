@@ -181,6 +181,8 @@ def train_epoch(logger, loader, model, optimizer, batch_accumulation, scheduler)
                                     lr = optimizer.param_groups[0]['lr'], 
                                     time_used = time.time()-time_start, 
                                     logger = logger)
+        if iter == 10:
+            break
 
 
 def eval_epoch(logger, loader, model, test_metrics=False):
@@ -214,5 +216,7 @@ def eval_epoch(logger, loader, model, test_metrics=False):
                                         lr = 0, 
                                         time_used = time.time()-time_start, 
                                         logger = logger)
+            if iter == 10 and not test_metrics:
+                break
 
         

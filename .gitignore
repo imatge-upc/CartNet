@@ -5,3 +5,5 @@
 *.csv
 results/
 wandb/
+dataset/ADP_DATASET/
+dataset/megnet/

@@ -109,13 +109,13 @@ def create_loader():
     # cfg.batch = 32
     loaders = [
         DataLoader(dataset_train, batch_size=cfg.batch, persistent_workers=True,
-                                  shuffle=True, num_workers=6,
+                                  shuffle=True, num_workers=cfg.workers,
                                   pin_memory=True),
         DataLoader(dataset_val, batch_size=cfg.batch, persistent_workers=True,
-                                    shuffle=False, num_workers=6,
+                                    shuffle=False, num_workers=cfg.workers,
                                     pin_memory=True),
-        DataLoader(dataset_test, batch_size=1 if cfg.dataset.name == "ADP" else cfg.batch, persistent_workers=True,
-                                    shuffle=False, num_workers=6,
+        DataLoader(dataset_test, batch_size=1 if cfg.dataset.name == "ADP" else cfg.batch, persistent_workers=False,
+                                    shuffle=False, num_workers=cfg.workers,
                                     pin_memory=True)
     ]
     

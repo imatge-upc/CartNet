@@ -40,50 +40,54 @@ class DatasetADP(Dataset):
         return data
     
     def get(self, idx):
-        data = torch.load(osp.join(self.original_root,self.file_names[idx]+".pt"))
+        try:
+            data = torch.load(osp.join(self.original_root,self.file_names[idx]+".pt"))
 
-        if self.standarize_temp:
-            data.temperature_og = data.temperature
-            data.temperature = ((data.temperature - self.mean_temp) / self.std_temp)
-        
-        
-        
-        data.non_H_mask = data.x != 1
-
-        
-        if not self.hydrogens:
-            #Remove hydrogens
-            data.x = data.x[data.non_H_mask]
-            data.y = data.y[data.non_H_mask]
-            data.pos = data.pos[data.non_H_mask]
-           
-            atoms = torch.arange(0,data.non_H_mask.shape[0])[data.non_H_mask]
-            bool_mask_source = torch.isin(data.edge_index[0], atoms )
-            bool_mask_target = torch.isin(data.edge_index[1], atoms )
-            bool_mask_combined = bool_mask_source & bool_mask_target
-            data.edge_index = data.edge_index[:, bool_mask_combined]
+            if self.standarize_temp:
+                data.temperature_og = data.temperature
+                data.temperature = ((data.temperature - self.mean_temp) / self.std_temp)
+            
+            
+            
+            data.non_H_mask = data.x != 1
 
             
-            node_mapping = {old: new for new, old in enumerate(atoms.tolist())}
-        
+            if not self.hydrogens:
+                #Remove hydrogens
+                data.x = data.x[data.non_H_mask]
+                data.y = data.y[data.non_H_mask]
+                data.pos = data.pos[data.non_H_mask]
             
-            data.edge_index = torch.tensor([[node_mapping[edge[0].item()], node_mapping[edge[1].item()]] for edge in data.edge_index.t()]).t()
+                atoms = torch.arange(0,data.non_H_mask.shape[0])[data.non_H_mask]
+                bool_mask_source = torch.isin(data.edge_index[0], atoms )
+                bool_mask_target = torch.isin(data.edge_index[1], atoms )
+                bool_mask_combined = bool_mask_source & bool_mask_target
+                data.edge_index = data.edge_index[:, bool_mask_combined]
 
+                
+                node_mapping = {old: new for new, old in enumerate(atoms.tolist())}
             
-            data.edge_attr = data.edge_attr[bool_mask_combined, :]
-            data.non_H_mask = torch.ones(data.x.shape[0], dtype=torch.bool)
+                
+                data.edge_index = torch.tensor([[node_mapping[edge[0].item()], node_mapping[edge[1].item()]] for edge in data.edge_index.t()]).t()
+
+                
+                data.edge_attr = data.edge_attr[bool_mask_combined, :]
+                data.non_H_mask = torch.ones(data.x.shape[0], dtype=torch.bool)
+            
         
-    
-        if self.optimize_cell:
-            data.cell_og = data.cell
-            data.cell, rotation_matrix = optmize_lattice(data.cell.squeeze(0))
-            data.cell = data.cell.unsqueeze(0)
-            data.cart_dir = data.cart_dir @ rotation_matrix
-            data.y = rotation_matrix.transpose(-1,-2) @ data.y @ rotation_matrix
+            if self.optimize_cell:
+                data.cell_og = data.cell
+                data.cell, rotation_matrix = optmize_lattice(data.cell.squeeze(0))
+                data.cell = data.cell.unsqueeze(0)
+                data.cart_dir = data.cart_dir @ rotation_matrix
+                data.y = rotation_matrix.transpose(-1,-2) @ data.y @ rotation_matrix
 
 
-        if self.augment:
-            data = self.augment_data(data)
+            if self.augment:
+                data = self.augment_data(data)
+        except Exception as e:
+            print(e)
+            raise Exception(f"Error loading file {self.file_names[idx]}")
         
         return data
 
