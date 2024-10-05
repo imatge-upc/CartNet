@@ -1,8 +1,8 @@
 import torch
 import logging
 import argparse
-import random
-import numpy as np
+import pickle
+from tqdm import tqdm
 from logger.logger import create_logger
 from loader.loader import create_loader
 from models.master import create_model
@@ -105,7 +105,7 @@ if __name__ == "__main__":
     set_cfg(cfg)
 
     args, _ = parser.parse_known_args()
-    cfg.seed = cfg.seed
+    cfg.seed = args.seed
     cfg.name = args.name
     cfg.run_dir = "results/"+cfg.name+"/"+str(cfg.seed)
     cfg.dataset.task_type = "regression"
@@ -121,7 +121,7 @@ if __name__ == "__main__":
     cfg.learning_rate = args.learning_rate
     cfg.warmup = args.warmup
     cfg.model = args.model
-    cfg.max_neighbours = None if cfg.model== "CartNet" else args.max_neighbours
+    cfg.max_neighbours = False if cfg.model== "CartNet" else args.max_neighbours
     cfg.radius = args.radius
     cfg.num_layers = args.num_layers
     cfg.dim_in = args.dim_in
