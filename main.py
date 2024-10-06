@@ -134,6 +134,7 @@ if __name__ == "__main__":
     cfg.use_H = args.disable_H
     cfg.workers = args.workers
 
+
     torch.set_num_threads(args.threads)
 
     set_printing()

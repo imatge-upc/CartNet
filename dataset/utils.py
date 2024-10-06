@@ -1,11 +1,11 @@
 import logging
 import os
+import os.path as osp
 from tqdm import tqdm
 import numpy as np
 import torch
 from torch_geometric.data import Data, Batch
 from torch_scatter import  segment_coo, segment_csr
-import roma
 
 
 
@@ -454,30 +454,35 @@ def optmize_lattice(lattice_vectors):
 
 
 def compute_knn(max_neigh, radius, path, refcodes):
-    final_root = os.path.join(path, "data_"+str(max_neigh)+"/")
-
+    print(max_neigh)
+    
+    final_root = os.path.join(path, "data_"+str(max_neigh)+"_"+str(radius)+"/")
+    print(final_root)
+    
     if os.path.exists(final_root) and os.path.isdir(final_root):
-        logging.info("Already computed PBC for knn "+str(max_neigh))
+        logging.info("Already computed PBC for knn "+str(max_neigh) + " and radius "+str(radius))
         return final_root
     else:
         os.makedirs(final_root)
+        os.makedirs(osp.join(final_root,"data/"))
 
     
     for split in refcodes:
         with open(split, 'r') as file:
             file_names = [line.strip() for line in file.readlines()]
-        for file_name in tqdm(file_names, ncols=50, desc="Computing PBC"):
-            data = torch.load(osp.join(original_root,file_name+".pt"))
+        for file_name in tqdm(file_names, ncols=100, desc="Computing PBC"):
+            data = torch.load(osp.join(path,"data/"+file_name+".pt"))
             
             data.pbc = torch.tensor([[True, True, True]])
 
             batch = Batch.from_data_list([data])
             edge_index, _, _, cart_vector = radius_graph_pbc(batch, radius, max_neigh)
             
+            data.edge_index = edge_index
             data.cart_dist = torch.norm(cart_vector, p=2, dim=-1).unsqueeze(-1)
             data.cart_dir = torch.nn.functional.normalize(cart_vector, p=2, dim=-1)
 
-            torch.save(data, osp.join(final_root,file_name+".pt"))
+            torch.save(data, osp.join(final_root,"data/"+file_name+".pt"))
     return final_root
     
 

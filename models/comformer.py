@@ -9,8 +9,10 @@ modified to add temperature
 
 import torch
 from torch import nn
-from network.transformer import ComformerConv, ComformerConv_edge, ComformerConvEqui
+from models.comformer_conv import ComformerConv, ComformerConv_edge, ComformerConvEqui
 from models.cartnet import Cholesky_head
+from models.utils import RBFExpansion
+
 
 
 def bond_cosine(r1, r2):
@@ -51,7 +53,7 @@ class eComformer(nn.Module):
 
         self.equi_update = ComformerConvEqui(in_channels=self.dim_in, out_channels=self.dim_in, edge_dim=self.dim_in, use_second_order_repr=True)
 
-        self.cholesky = Cholesky_head(self.dim_in, 6)
+        self.cholesky = Cholesky_head(self.dim_in)
 
     def forward(self, data) -> torch.Tensor:
         node_features = self.embedding(data.x) + self.temperature_proj_atom(data.temperature.unsqueeze(-1))[data.batch]
@@ -108,7 +110,7 @@ class iComformer(nn.Module): # iComFormer
 
         self.edge_update_layer = ComformerConv_edge(in_channels=self.dim_in, out_channels=self.dim_in, heads=1, edge_dim=self.dim_in)
         
-        self.cholesky = Cholesky_head(self.dim_in, 6)
+        self.cholesky = Cholesky_head(self.dim_in)
 
     def forward(self, data) -> torch.Tensor:
         node_features = self.embedding(data.x) + self.temperature_proj_atom(data.temperature.unsqueeze(-1))[data.batch]

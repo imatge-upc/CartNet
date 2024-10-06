@@ -44,8 +44,7 @@ def train(model, loaders, optimizer, loggers):
 
     
     run = wandb.init(entity=cfg.wandb_entity, project=cfg.wandb_project,
-                    name=cfg.name)
-    
+                    name=cfg.name, config=cfg)
 
     num_splits = len(loggers)
     full_epoch_times = []

@@ -18,7 +18,7 @@ def create_loader():
         refcodes = [osp.join(cfg.dataset_path,"train_files.csv"), osp.join(cfg.dataset_path,"val_files.csv"), osp.join(cfg.dataset_path,"test_files.csv")]
         if cfg.model in ["icomformer", "ecomformer"]:
             assert cfg.max_neighbours is not None, "max_neighbours are needed for e/iComformer"
-            cfg.dataset_path = compute_knn(cfg.max_neighbours, cfg.radius, cfg.path, refcodes)
+            cfg.dataset_path = compute_knn(cfg.max_neighbours, cfg.radius, cfg.dataset_path, refcodes)
 
         optimize_cell = True if cfg.model == "icomformer" else False
         dataset_train, dataset_val, dataset_test = (DatasetADP(root=osp.join(cfg.dataset_path, "data/"), file_names=refcodes[0], hydrogens=cfg.use_H, standarize_temp = cfg.standarize_temp, augment=cfg.augment, optimize_cell=optimize_cell),
