@@ -56,8 +56,8 @@ def montecarlo(model, loader):
                 pred, _ = model(batch_copy)
                 inference_output["pred"].append(pred.detach().to("cpu"))
                 inference_output["true"].append(pseudo_true.detach().to("cpu"))
-                inference_output["iou"].append(compute_3D_IoU(_pred, _true).detach().to("cpu"))
-                inference_output["mae"].append(compute_loss(_pred, _true)[0].detach().to("cpu"))
+                inference_output["iou"].append(compute_3D_IoU(pred, pseudo_true).detach().to("cpu"))
+                inference_output["mae"].append(compute_loss(pred, pseudo_true)[0].detach().to("cpu"))
             pickle.dump(inference_output, open(cfg.inference_output.replace(".pkl", "_montecarlo_"+str(i)+".pkl"), "wb"))
             iou_montecarlo+=inference_output["iou"]
             mae_montecarlo+=inference_output["mae"]
@@ -85,7 +85,7 @@ if __name__ == "__main__":
     parser.add_argument("--wandb_entity", type=str, default="aiquaneuro", help="Name of the wandb entity")
     parser.add_argument("--loss", type=str, default="MAE", help="Loss function")
     parser.add_argument("--epochs", type=int, default=50, help="Number of epochs")
-    parser.add_argument("--learning_rate", type=float, default=1e-3, help="Learning rate")
+    parser.add_argument("--lr", type=float, default=1e-3, help="Learning rate")
     parser.add_argument("--warmup", type=float, default=0.01, help="Warmup")
     parser.add_argument('--model', type=str, default="CartNet", help="Model Name")
     parser.add_argument("--max_neighbours", type=int, default=25, help="Max neighbours (only for iComformer/eComformer)")
@@ -104,7 +104,7 @@ if __name__ == "__main__":
     
     set_cfg(cfg)
 
-    args, _ = parser.parse_known_args()
+    args = parser.parse_args()
     cfg.seed = args.seed
     cfg.name = args.name
     cfg.run_dir = "results/"+cfg.name+"/"+str(cfg.seed)
@@ -118,7 +118,7 @@ if __name__ == "__main__":
     cfg.wandb_entity = args.wandb_entity
     cfg.loss = args.loss
     cfg.optim.max_epoch = args.epochs
-    cfg.learning_rate = args.learning_rate
+    cfg.lr = args.lr
     cfg.warmup = args.warmup
     cfg.model = args.model
     cfg.max_neighbours = None if cfg.model== "CartNet" else args.max_neighbours
@@ -152,7 +152,7 @@ if __name__ == "__main__":
     cfg.params_count = params_count(model)
     logging.info(f"Number of parameters: {cfg.params_count}")
 
-    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.learning_rate)
+    optimizer = torch.optim.Adam(model.parameters(), lr=cfg.lr)
 
     loggers = create_logger()
 

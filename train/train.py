@@ -51,7 +51,7 @@ def train(model, loaders, optimizer, loggers):
     perf = [[] for _ in range(num_splits-1)]
     ckpt_dir = osp.join(cfg.run_dir,"ckpt/")
 
-    scheduler = OneCycleLR(optimizer, max_lr=cfg.learning_rate, total_steps=cfg.optim.max_epoch *len(loaders[0])//cfg.batch_accumulation + cfg.optim.max_epoch , pct_start=cfg.warmup)
+    scheduler = OneCycleLR(optimizer, max_lr=cfg.lr, total_steps=cfg.optim.max_epoch * len(loaders[0]) // cfg.batch_accumulation + cfg.optim.max_epoch , pct_start=cfg.warmup)
 
     for cur_epoch in range(cfg.optim.max_epoch):
         start_time = time.perf_counter()
