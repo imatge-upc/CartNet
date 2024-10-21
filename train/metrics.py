@@ -21,6 +21,17 @@ def get_error_volume(pred, true):
     volume_pred = get_volume(true)
     return (torch.abs(volume_true - volume_pred)/(volume_true+SMOOTH))
 
+def get_KL(pred, true):
+    p = torch.distributions.multivariate_normal.MultivariateNormal(torch.zeros(true.shape[0],3, device=true.device), true)
+    q = torch.distributions.multivariate_normal.MultivariateNormal(torch.zeros(pred.shape[0],3, device=true.device), pred)
+
+    return torch.distributions.kl.kl_divergence(p, q)
+
+def get_similarity_index(pred, true):
+    r12_num = 2 ** (3 / 2) * torch.linalg.det(torch.linalg.inv(true) @ torch.linalg.inv(pred)) ** (1 / 4)
+    r12_den = torch.linalg.det(torch.linalg.inv(true) + torch.linalg.inv(pred)) ** (1 / 2)
+    return 100*(1-r12_num/r12_den)
+
 def iou_pytorch3D(outputs: torch.Tensor, labels: torch.Tensor):
 
     intersection = (outputs & labels).float().sum((1, 2, 3))  # Will be zero if Truth=0 or Prediction=0
@@ -81,12 +92,12 @@ def compute_3D_IoU(pred,true):
 
     return iou
 
-def compute_metrics_and_logging(pred, true, mae, mse, loss, volume_percentage_error, lr, time_used, logger, iou=None):
+def compute_metrics_and_logging(pred, true, mae, mse, loss, lr, time_used, logger, test_metrics=False):
     
     if cfg.dataset.name == "ADP":
-        if iou is not None:
-            logger.update_stats(true = true,
-                                pred = pred,
+        if test_metrics:
+            logger.update_stats(true = true.to("cpu"),
+                                pred = pred.to("cpu"),
                                 loss = loss.mean().item(),
                                 MAE = mae.mean().item(),
                                 MSE = mse.mean().item(),
@@ -94,24 +105,26 @@ def compute_metrics_and_logging(pred, true, mae, mse, loss, volume_percentage_er
                                 time_used = time_used,
                                 params = cfg.params_count,
                                 dataset_name = cfg.dataset.name,
-                                volume_percentage_error = volume_percentage_error.mean().item(),
-                                iou = iou.mean().item()
+                                volume_percentage_error = get_error_volume(pred,true).mean().item(),
+                                iou = compute_3D_IoU(pred,true).mean().item(),
+                                similarity_index = get_similarity_index(pred, true).mean().item(),
                             )
         else:
-            logger.update_stats(true = true,
-                            pred = pred,
+            logger.update_stats(true = true.to("cpu"),
+                            pred = pred.to("cpu"),
                             loss = loss.mean().item(),
                             MAE = mae.mean().item(),
                             MSE = mse.mean().item(),
                             lr = lr,
-                            volume_percentage_error = volume_percentage_error.mean().item(),
+                            volume_percentage_error = get_error_volume(pred,true).mean().item(),
+                            similarity_index = get_similarity_index(pred, true).mean().item(),
                             time_used = time_used,
                             params = cfg.params_count,
                             dataset_name = cfg.dataset.name,
                         )
     else:
-        logger.update_stats(true = true,
-                            pred = pred,
+        logger.update_stats(true = true.to("cpu"),
+                            pred = pred.to("cpu"),
                             loss = loss.mean().item(),
                             MAE = mae.mean().item(),
                             MSE = mse.mean().item(),

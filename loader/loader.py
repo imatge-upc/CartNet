@@ -6,6 +6,7 @@ from torch_geometric.graphgym.config import cfg
 from torch_geometric.loader import DataLoader
 import random
 import os.path as osp
+import numpy as np
 
 def create_loader():
     """

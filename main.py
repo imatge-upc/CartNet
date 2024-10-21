@@ -14,59 +14,81 @@ from torch_geometric.graphgym.logger import set_printing
 
 
 def inference(model, loader):
-    from train.metrics import compute_loss, compute_3D_IoU
+    from train.metrics import compute_loss, compute_3D_IoU, get_similarity_index
     model.eval()
     
     with torch.no_grad():
-        inference_output = {"pred": [], "true": [], "refcode": [], "pos": [], "atoms": [], "iou": [], "mae": []}
+        inference_output = {"pred": [], "true": [], "temp": [], "cell": [], "refcode": [], "pos": [], "atoms": [], "iou": [], "mae": [], "similarity_index": []}
         for iter, batch in tqdm(enumerate(loader), total=len(loader), ncols=50):
             batch.to("cuda:0")
+            inference_output["cell"].append(batch.cell.detach().to("cpu"))
             inference_output["atoms"].append(batch.x[batch.non_H_mask].detach().to("cpu"))
             inference_output["pos"].append(batch.pos[batch.non_H_mask].detach().to("cpu"))
-            inference_output["refcode"].append(batch.refcode)
+            inference_output["refcode"].append(batch.refcode[0])
+            inference_output["temp"].append(batch.temperature_og.detach().to("cpu")[0])
             _pred, _true = model(batch)
             inference_output["pred"].append(_pred.detach().to("cpu"))
             inference_output["true"].append(_true.detach().to("cpu"))
             inference_output["iou"].append(compute_3D_IoU(_pred, _true).detach().to("cpu"))
             inference_output["mae"].append(compute_loss(_pred, _true)[0].detach().to("cpu"))
-            
+            inference_output["similarity_index"].append(get_similarity_index(_pred, _true).detach().to("cpu"))
+        
+        
+        iou = torch.cat(inference_output["iou"], dim=0)
+        mae = torch.cat(inference_output["mae"], dim=0)
+        similarity_index = torch.cat(inference_output["similarity_index"], dim=0)
+        
+        logging.info(f"Mean IoU: {iou.mean().item()} +/- {iou.std().item()}")
+        logging.info(f"Mean MAE: {mae.mean().item()} +/- {mae.std().item()}")
+        logging.info(f"Mean Similarity Index: {similarity_index.mean().item()} +/- {similarity_index.std().item()}")
+
         pickle.dump(inference_output, open(cfg.inference_output, "wb"))
 
 def montecarlo(model, loader):
-    from train.metrics import compute_loss, compute_3D_IoU
+    from train.metrics import compute_loss, compute_3D_IoU, get_similarity_index
     import roma
 
     model.eval()
     iou_montecarlo = []
+    similarity_index_montecarlo = []
     mae_montecarlo = []
     with torch.no_grad():
-        for i in range(100):
-            inference_output = {"pred": [], "true": [], "refcode": [], "pos": [], "atoms": [], "iou": [], "mae": []}
+        for i in tqdm(range(100), ncols=50, desc="Montecarlo"):
+            inference_output = {"pred": [], "true": [], "cell": [], "refcode": [], "pos": [], "atoms": [], "mae": [], "iou": [], "similarity_index": []}
             for iter, batch in tqdm(enumerate(loader), total=len(loader), ncols=50):
                 batch_copy = batch.clone()
                 batch.to("cuda:0")
+                inference_output["cell"].append(batch.cell.detach().to("cpu"))
                 inference_output["atoms"].append(batch.x[batch.non_H_mask].detach().to("cpu"))
                 inference_output["pos"].append(batch.pos[batch.non_H_mask].detach().to("cpu"))
-                inference_output["refcode"].append(batch.refcode)
+                inference_output["refcode"].append(batch.refcode[0])
                 pseudo_true, _ = model(batch)
-                R = roma.utils.random_rotmat(size=1, device=batch.x.device).squeeze(0)
-                pseudo_true =  R.transpose(-1,-2) @ pseudo_true @ R
+                R = roma.utils.random_rotmat(size=1, device=pseudo_true.device).squeeze(0)
                 batch_copy.to("cuda:0")
                 batch_copy.cart_dir = batch_copy.cart_dir @ R
+                pseudo_true =  R.transpose(-1,-2) @ pseudo_true @ R
                 pred, _ = model(batch_copy)
                 inference_output["pred"].append(pred.detach().to("cpu"))
                 inference_output["true"].append(pseudo_true.detach().to("cpu"))
                 inference_output["iou"].append(compute_3D_IoU(pred, pseudo_true).detach().to("cpu"))
+                inference_output["similarity_index"].append(get_similarity_index(pred, pseudo_true).detach().to("cpu"))
                 inference_output["mae"].append(compute_loss(pred, pseudo_true)[0].detach().to("cpu"))
             pickle.dump(inference_output, open(cfg.inference_output.replace(".pkl", "_montecarlo_"+str(i)+".pkl"), "wb"))
+            logging.info(f"Montecarlo {i}")
+            logging.info(f"IoU: {torch.cat(inference_output['iou'], dim=0).mean().item()}")
+            logging.info(f"MAE: {torch.cat(inference_output['mae'], dim=0).mean().item()}")
+            logging.info(f"Similarity Index: {torch.cat(inference_output['similarity_index'], dim=0).mean().item()}")
             iou_montecarlo+=inference_output["iou"]
             mae_montecarlo+=inference_output["mae"]
+            similarity_index_montecarlo+=inference_output["similarity_index"]
     
     iou_montecarlo = torch.cat(iou_montecarlo, dim=0)
     mae_montecarlo = torch.cat(mae_montecarlo, dim=0)
+    similarity_index_montecarlo = torch.cat(similarity_index_montecarlo, dim=0)
 
-    logging.info(f"Montecarlo IoU: {iou_montecarlo.mean().item()}+/-{iou_montecarlo.std().item()}")
-    logging.info(f"Montecarlo MAE: {mae_montecarlo.mean().item()}+/-{mae_montecarlo.std().item()}")
+    logging.info(f"Montecarlo IoU: {iou_montecarlo.mean().item()} +/- {iou_montecarlo.std().item()}")
+    logging.info(f"Montecarlo MAE: {mae_montecarlo.mean().item()} +/- {mae_montecarlo.std().item()}")
+    logging.info(f"Montecarlo Similarity Index: {similarity_index_montecarlo.mean().item()} +/- {similarity_index_montecarlo.std().item()}")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -78,7 +100,7 @@ if __name__ == "__main__":
     parser.add_argument("--dataset_path", type=str, default="./dataset/ADP_DATASET/")
     parser.add_argument("--inference", action="store_true", help="Inference")
     parser.add_argument("--montecarlo", action="store_true", help="Montecarlo")
-    parser.add_argument("--weighs_path", type=str, default=None, help="Path to the weights of the model")
+    parser.add_argument("--checkpoint_path", type=str, default=None, help="Path of the checkpoints of the model")
     parser.add_argument("--inference_output", type=str, default="./inference.pkl", help="Path to the inference output")
     parser.add_argument("--figshare_target", type=str, default="formation_energy_peratom", help="Figshare dataset target")
     parser.add_argument("--wandb_project", type=str, default="ADP", help="Wandb project name")
@@ -93,7 +115,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_layers", type=int, default=4, help="Number of layers")
     parser.add_argument("--dim_in", type=int, default=256, help="Input dimension")
     parser.add_argument("--dim_rbf", type=int, default=64, help="Number of RBF")
-    parser.add_argument('--augment', action='store_true', help='Hydrogens')
+    parser.add_argument('--augment', action='store_true', help='augment')
     parser.add_argument("--invariant", action="store_true", help="Rotation Invariant model")
     parser.add_argument("--disable_temp", action="store_false", help="Disable Temperature")
     parser.add_argument("--no_standarize_temp", action="store_false", help="Standarize temperature")
@@ -108,6 +130,7 @@ if __name__ == "__main__":
     cfg.seed = args.seed
     cfg.name = args.name
     cfg.run_dir = "results/"+cfg.name+"/"+str(cfg.seed)
+    cfg.inference_output = args.inference_output
     cfg.dataset.task_type = "regression"
     cfg.batch = args.batch
     cfg.batch_accumulation = args.batch_accumulation
@@ -121,7 +144,7 @@ if __name__ == "__main__":
     cfg.lr = args.lr
     cfg.warmup = args.warmup
     cfg.model = args.model
-    cfg.max_neighbours = None if cfg.model== "CartNet" else args.max_neighbours
+    cfg.max_neighbours = -1 if cfg.model== "CartNet" else args.max_neighbours
     cfg.radius = args.radius
     cfg.num_layers = args.num_layers
     cfg.dim_in = args.dim_in
@@ -157,15 +180,18 @@ if __name__ == "__main__":
     loggers = create_logger()
 
     if args.inference:
-        assert args.weighs_path is not None, "Weights path not provided"
+        assert args.checkpoint_path is not None, "Weights path not provided"
         assert cfg.dataset.name == "ADP", "Inference only for ADP dataset"
-        ckpt = torch.load(args.weighs_path)
+        ckpt = torch.load(args.checkpoint_path)
         model.load_state_dict(ckpt["model_state"])
         cfg.inference_output = args.inference_output
         inference(model, loaders[-1])
     elif args.montecarlo:
-        assert args.weighs_path is not None, "Weights path not provided"
+        assert args.checkpoint_path is not None, "Weights path not provided"
         assert cfg.dataset.name == "ADP", "Montecarlo only for ADP dataset"
+        ckpt = torch.load(args.checkpoint_path)
+        model.load_state_dict(ckpt["model_state"])
+        cfg.inference_output = args.inference_output
         montecarlo(model, loaders[-1])
     else:
         train(model, loaders, optimizer, loggers)

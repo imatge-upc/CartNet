@@ -8,7 +8,7 @@ import os.path as osp
 from tqdm import tqdm
 from torch_geometric.graphgym.config import cfg
 from torch.optim.lr_scheduler import OneCycleLR
-from train.metrics import compute_metrics_and_logging, compute_loss, compute_3D_IoU, get_error_volume
+from train.metrics import compute_metrics_and_logging, compute_loss
 
 
 def flatten_dict(metrics):
@@ -170,13 +170,11 @@ def train_epoch(logger, loader, model, optimizer, batch_accumulation, scheduler)
             optimizer.zero_grad()
         
 
-        compute_metrics_and_logging(pred = pred.detach().to('cpu'), 
-                                    true = true.detach().to('cpu'), 
+        compute_metrics_and_logging(pred = pred.detach(), 
+                                    true = true.detach(), 
                                     mae = MAE, 
                                     mse = MSE,
                                     loss = loss,
-                                    volume_percentage_error = get_error_volume(pred, true),
-                                    iou = None,
                                     lr = optimizer.param_groups[0]['lr'], 
                                     time_used = time.time()-time_start, 
                                     logger = logger)
@@ -203,15 +201,14 @@ def eval_epoch(logger, loader, model, test_metrics=False):
                 raise Exception("Loss not implemented")
             
 
-            compute_metrics_and_logging(pred = pred.detach().to('cpu'), 
-                                        true = true.detach().to('cpu'), 
+            compute_metrics_and_logging(pred = pred.detach(), 
+                                        true = true.detach(), 
                                         mae = MAE, 
                                         mse = MSE,
                                         loss = loss,
-                                        volume_percentage_error = get_error_volume(pred, true),
-                                        iou = compute_3D_IoU(pred, true).detach().to('cpu') if test_metrics else None,
                                         lr = 0, 
                                         time_used = time.time()-time_start, 
-                                        logger = logger)
+                                        logger = logger,
+                                        test_metrics=test_metrics)
 
         
