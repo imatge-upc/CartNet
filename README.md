@@ -203,7 +203,7 @@ Links to download pre-trained models:
 
 ## Known Issues
 
-Due to the presence of certain non-deterministic operations in PyTorch, as discussed [here](https://pytorch.org/docs/stable/notes/randomness.html), some results may not be fully reproducible or may exhibit slight variations. This variability can also arise when using different GPU models for training and testing the network.
+Due to the presence of certain non-deterministic operations in PyTorch, as discussed [here](https://pytorch.org/docs/stable/notes/randomness.html), some results may not be exactly reproducible and may exhibit slight variations. This variability can also arise when using different GPU models for training and testing the network.
 
 ## Citation
 
