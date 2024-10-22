@@ -181,7 +181,7 @@ Results on Jarvis Dataset:
 
 (best result in **bold** and second best in _italic_)
 
-## The Materials Project
+### The Materials Project
 
 | Method      | Form. Energy (meV/atom) ↓ | Band Gap (meV) ↓ | Bulk Moduli (log(GPa)) ↓ | Shear Moduli (log(GPa)) ↓ |
 |-------------|---------------------------|------------------|--------------------------|--------------------------|
