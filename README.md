@@ -67,6 +67,20 @@ These dependencies are automatically installed when you create the Conda environ
 
 ## Dataset
 
+### ADP Dataset:
+
+The ADP dataset can be downloaded from the following link.
+
+The dataset can be extracted using:
+tar -xf adp_dataset.tar.gz
+
+[!NOTE]
+
+The ADP_DATASET/ folder should be placed inside the dataset/ folder or scpecify the new path via --dataset_path flag in main.py
+
+
+
+
 ## Training
 
 To recreate the experiments from the paper:
@@ -77,19 +91,46 @@ To recreate the experiments from the paper:
 To train **ADP Dataset** using **CartNet**:
 
 ```sh
-bash train_scripts/train_cartnet_adp.sh
+cd scripts/
+bash train_cartnet_adp.sh
 ```
 
 To train **ADP Dataset** using **eComformer**:
 
 ```sh
-bash train_scripts/train_ecomformer_adp.sh
+cd scripts/
+bash train_ecomformer_adp.sh
 ```
 To train **ADP Dataset** using **eComformer**:
 
 ```sh
-bash train_scripts/train_icomformer_adp.sh
+cd scripts/
+bash train_icomformer_adp.sh
 ```
+
+To run the ablation experiments in the **ADP Dataset**:
+
+```sh
+cd scripts/
+bash run_ablations.sh
+````
+
+### Jarvis:
+
+```sh
+cd scripts/
+bash train_cartnet_jarvis.sh
+````
+
+### The Materials Project
+
+```sh
+cd scripts/
+bash train_cartnet_megnet.sh
+```
+
+
+
 
 ## Evaluation
 
@@ -97,7 +138,7 @@ Instructions to evaluate the model:
 
 ```sh
 # Command to evaluate the model
-python evaluate.py --config configs/eval_config.yaml --checkpoint path/to/checkpoint.pth
+python main.py --inference --checkpoint_path path/to/checkpoint.pth
 ```
 
 ## Results

@@ -9,13 +9,13 @@ import roma
 
 
 class Figshare_Dataset(InMemoryDataset):
-    def __init__(self, root, data, targets, transform=None, pre_transform=None, name="jarvis", radius=5.0, max_neigh=None, augment=False):
+    def __init__(self, root, data, targets, transform=None, pre_transform=None, name="jarvis", radius=5.0, max_neigh=-1, augment=False):
         
         self.data = data
         self.targets = targets
         self.name = name
         self.radius = radius
-        self.max_neigh = None
+        self.max_neigh = max_neigh if max_neigh > 0 else None
         self.augment = augment
         super(Figshare_Dataset, self).__init__(root, transform, pre_transform)
         self.data, self.slices = torch.load(self.processed_paths[0])
@@ -64,7 +64,7 @@ class Figshare_Dataset(InMemoryDataset):
             batch = Batch.from_data_list([data])
             edge_index, _, _, cart_vector = radius_graph_pbc(batch, self.radius, self.max_neigh)
             
-            data.cart_dist = torch.norm(cart_vector, p=2, dim=-1).unsqueeze(-1)
+            data.cart_dist = torch.norm(cart_vector, p=2, dim=-1)
             data.cart_dir = torch.nn.functional.normalize(cart_vector, p=2, dim=-1)
             
 

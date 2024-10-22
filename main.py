@@ -96,7 +96,7 @@ if __name__ == "__main__":
     parser.add_argument('--name', type=str, default="CartNet", help="name of the Wandb experiment" )
     parser.add_argument("--batch", type=int, default=4, help="Batch size")
     parser.add_argument("--batch_accumulation", type=int, default=16, help="Batch Accumulation")
-    parser.add_argument("--dataset", type=str, default="ADP", help="Dataset name. Available: ADP, Jarvis, MaterialsProject")
+    parser.add_argument("--dataset", type=str, default="ADP", help="Dataset name. Available: ADP, jarvis, megnet")
     parser.add_argument("--dataset_path", type=str, default="./dataset/ADP_DATASET/")
     parser.add_argument("--inference", action="store_true", help="Inference")
     parser.add_argument("--montecarlo", action="store_true", help="Montecarlo")

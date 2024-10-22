@@ -37,18 +37,18 @@ def create_loader():
             cfg.dataset.name = "dft_3d_2021"
 
         seed = 123 #PotNet uses seed=123 for the comparative table
-        target = cfg.jarvis_target
-        if cfg.jarvis_target in ["shear modulus", "bulk modulus"] and cfg.dataset.name == "megnet":
+        target = cfg.figshare_target
+        if cfg.figshare_target in ["shear modulus", "bulk modulus"] and cfg.dataset.name == "megnet":
             import pickle as pk
-            target = cfg.jarvis_target
-            if cfg.jarvis_target == "bulk modulus":
+            target = cfg.figshare_target
+            if cfg.figshare_target == "bulk modulus":
                 try:
                     data_train = pk.load(open("./dataset/megnet/bulk_megnet_train.pkl", "rb"))
                     data_val = pk.load(open("./dataset/megnet/bulk_megnet_val.pkl", "rb"))
                     data_test = pk.load(open("./dataset/megnet/bulk_megnet_test.pkl", "rb"))
                 except:
                     raise Exception("Bulk modulus dataset not found, please download it from https://figshare.com/projects/Bulk_and_shear_datasets/165430")
-            elif cfg.jarvis_target == "shear modulus":
+            elif cfg.figshare_target == "shear modulus":
                 try:
                     data_train = pk.load(open("./dataset/megnet/shear_megnet_train.pkl", "rb"))
                     data_val = pk.load(open("./dataset/megnet/shear_megnet_val.pkl", "rb"))
@@ -75,7 +75,7 @@ def create_loader():
                         targets.append(i)
             
         else:
-            data = jdata(cfg.jarvis_name)
+            data = jdata(cfg.dataset.name)
             dat = []
             all_targets = []
             for i in data:
@@ -99,11 +99,11 @@ def create_loader():
             targets_val = [all_targets[i] for i in ids_val]
             targets_test = [all_targets[i] for i in ids_test]
         
-        radius = cfg.cutoff
-        prefix = cfg.jarvis_name+"_"+str(radius)+"_"+str(cfg.max_neighbours)+"_"+target+"_"+str(seed)
-        dataset_train = Figshare_Dataset(root=cfg.dataset_path, data=dat_train, targets=targets_train, radius=radius, name=prefix+"_train")
-        dataset_val = Figshare_Dataset(root=cfg.dataset_path, data=dat_val, targets=targets_val, radius=radius, name=prefix+"_val")
-        dataset_test = Figshare_Dataset(root=cfg.dataset_path, data=dat_test, targets=targets_test, radius=radius, name=prefix+"_test")
+        radius = cfg.radius
+        prefix = cfg.dataset.name+"_"+str(radius)+"_"+str(cfg.max_neighbours)+"_"+target+"_"+str(seed)
+        dataset_train = Figshare_Dataset(root=cfg.dataset_path, data=dat_train, targets=targets_train, radius=radius, max_neigh=cfg.max_neighbours, name=prefix+"_train")
+        dataset_val = Figshare_Dataset(root=cfg.dataset_path, data=dat_val, targets=targets_val, radius=radius, max_neigh=cfg.max_neighbours, name=prefix+"_val")
+        dataset_test = Figshare_Dataset(root=cfg.dataset_path, data=dat_test, targets=targets_test, radius=radius, max_neigh=cfg.max_neighbours, name=prefix+"_test")
     else:
         raise Exception("Dataset not implemented")
     
