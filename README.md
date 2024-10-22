@@ -6,6 +6,8 @@
 
 
 ## Overview
+CartNet is specifically designed for predicting Anisotropic Displacement Parameters (ADPs) in crystal structures. CartNet addresses the computational challenges of traditional methods by encoding the full 3D geometry of atomic structures into a Cartesian reference frame, bypassing the need for unit cell encoding. The model incorporates innovative features, including a neighbour equalization technique to enhance interaction detection and a Cholesky-based output layer to ensure valid ADP predictions. Additionally, it introduces a rotational SO(3) data augmentation technique to improve generalization across different crystal structure orientations, making the model highly efficient and accurate in predicting ADPs while significantly reducing computational costs
+
 
 Implementation of the CartNet model proposed in the paper:
 
@@ -21,9 +23,10 @@ Implementation of the CartNet model proposed in the paper:
 - [Training](#training)
 - [Results](#results)
 - [Pre-trained Models](#pre-trained-models)
+- [Known Issues](#known-issues)
 - [Citation](#citation)
 - [License](#license)
-- [Acknowledgments](#acknowledgments)
+
 
 
 ## Installation
@@ -69,20 +72,31 @@ These dependencies are automatically installed when you create the Conda environ
 
 ### ADP Dataset:
 
-The ADP dataset can be downloaded from the following link.
+The ADP (Anisotropic Displacement Parameters) dataset is curated from over 200,000 experimental crystal structures from the Cambridge Structural Database (CSD). This dataset is used to study atomic thermal vibrations represented through thermal ellipsoids. The dataset was curated to ensure high-quality and reliable ADPs. The dataset spans a wide temperature range (0K to 600K) and features a variety of atomic environments, with an average of 194.2 atoms per crystal structure. The dataset is split into 162,270 structures for training, 22,219 for validation, and 23,553 for testing.
+
+The ADP dataset can be downloaded from the following [link](https://drive.google.com/file/d/1lCKGG0Jtd7tjxmj1TgPkN8D_8uXXKlKF/view?usp=sharing).
 
 The dataset can be extracted using:
-tar -xf adp_dataset.tar.gz
 
-> [!NOTE] 
+```bash
+tar -xvzf adp_dataset.tar.gz
+```
+
+> [!NOTE]
+>
 > The ADP_DATASET/ folder should be placed inside the dataset/ folder or scpecify the new path via --dataset_path flag in main.py
 
+### Jarvis
+For tasks derived from Jarvis datset, we folowed the methdology of [Choudhary et al.](https://www.nature.com/articles/s41524-021-00650-1) in ALIGNN, utilizing the same training, validation, and test datasets. The dataset is automatically downloaded and processed by the code.
 
+### The Materials Project
 
+For tasks derived from The Materials Project, we followed the methodology of [Yan et al.](https://openreview.net/pdf?id=pqCT3L-BU9T) in Matformer, utilizing the same training, validation, and test datasets. The dataset is automatically downloaded and processed by the code, except for the bulk and shear modulus that are publicly available at [Figshare](https://figshare.com/projects/Bulk_and_shear_datasets/165430).
 
 ## Training
 
-To recreate the experiments from the paper:
+To recreate the experiments from the paper
+
 
 
 ### ADP:
@@ -136,26 +150,60 @@ bash train_cartnet_megnet.sh
 Instructions to evaluate the model:
 
 ```sh
-# Command to evaluate the model
 python main.py --inference --checkpoint_path path/to/checkpoint.pth
 ```
 
+<!-- TODO: table results -->
 ## Results
 
-Include quantitative results, such as accuracy, and qualitative results, like sample outputs:
+### ADP dataset
 
-| Metric   | Value |
-| -------- | ----- |
-| Accuracy | 95%   |
-| F1 Score | 0.94  |
-| ...      | ...   |
+Results on ADP Dataset:
+
+| Method      | MAE (Å²) ↓        | S₁₂ (%) ↓       | IoU (%) ↑       | #Params  |
+|-------------|-------------------|-----------------|-----------------|----------|
+| eComformer  | 6.21 · 10⁻³       | 2.47            | 74.34           | 5.55M    |
+| iComformer  | _3.22 · 10⁻³_     | _0.94_          | _81.97_         | 4.9M     |
+| CartNet     | **2.88 · 10⁻³**   | **0.75**        | **83.53**       | 2.5M     |
+
+(best result in **bold** and second best in _italic_)
+
+### Jarvis Dataset
+
+Results on Jarvis Dataset:
+| Method      | Form. Energy (meV/atom) ↓ | Band Gap (OPT) (meV) ↓ | Total energy (meV/atom) ↓ | Band Gap (MBJ) (meV) ↓ | Ehull (meV) ↓ |
+|-------------|---------------------------|------------------------|---------------------------|------------------------|---------------|
+| Matformer   | 32.5                      | 137                    | 35                        | 300                    | 64            |
+| PotNet      | 29.4                      | 127                    | 32                        | 270                    | 55            |
+| eComformer  | 28.4                      | 124                    | 32                        | 280                    | *44*          |
+| iComformer  | *27.2*                    | *122*                  | *28.8*                    | *260*                  | 47            |
+| CartNet     | **27.03**                 | **111.2**              | **26.26**                 | **247**                | **43.54**     |
+
+(best result in **bold** and second best in _italic_)
+
+## The Materials Project
+
+| Method      | Form. Energy (meV/atom) ↓ | Band Gap (meV) ↓ | Bulk Moduli (log(GPa)) ↓ | Shear Moduli (log(GPa)) ↓ |
+|-------------|---------------------------|------------------|--------------------------|--------------------------|
+| Matformer   | 21                        | 211              | 0.043                    | 0.073                    |
+| PotNet      | 18.8                      | 204              | 0.04                     | 0.065                    |
+| eComformer  | *18.16*                   | 202              | 0.0417                   | 0.0729                   |
+| iComformer  | 18.26                     | *193*            | *0.038*                  | *0.0637*                 |
+| CartNet     | **16.95**                 | **186**          | **0.0321**               | **0.0628**               |
+
+(best result in **bold** and second best in _italic_)
 
 ## Pre-trained Models
 
 Links to download pre-trained models:
 
-- [Model Name](link_to_model) (e.g., Google Drive, AWS S3)
+- [CartNet ADP Dataset](https://zenodo.org/records/13970823?token=eyJhbGciOiJIUzUxMiJ9.eyJpZCI6ImQxM2ExZjg2LWU4ODktNDhhZC04ODAxLTZjN2MxNGZjMWQ5ZSIsImRhdGEiOnt9LCJyYW5kb20iOiJhZWVlYjk2MmQ5ZjU1ODdiMDgzYmJhMDc4YWE1MTk3MyJ9.TLSJvG_khY3eD0bSWTGhZDtMS7YXk6KpXwLTXLDFPBbOF4PhlxlAeL9h2rpb3M20ushHhqOSfwfvutdfjAePhw
+)
 
+
+## Known Issues
+
+Due to the presence of certain non-deterministic operations in PyTorch, as discussed [here](https://pytorch.org/docs/stable/notes/randomness.html), some results may not be fully reproducible or may exhibit slight variations. This variability can also arise when using different GPU models for training and testing the network.
 
 ## Citation
 
@@ -177,10 +225,9 @@ If you use this code in your research, please cite:
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## Acknowledgments
+## Contact
 
-- Mention any collaborators or funding sources.
-- Credit libraries or resources that were helpful.
+For any questions and/or suggestions please contact [jaume.alexandre.sole@upc.edu](mailto:jaume.alexandre.sole@upc.edu)
 
 
 
