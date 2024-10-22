@@ -74,9 +74,8 @@ The ADP dataset can be downloaded from the following link.
 The dataset can be extracted using:
 tar -xf adp_dataset.tar.gz
 
-[!NOTE]
-
-The ADP_DATASET/ folder should be placed inside the dataset/ folder or scpecify the new path via --dataset_path flag in main.py
+> [!NOTE] 
+> The ADP_DATASET/ folder should be placed inside the dataset/ folder or scpecify the new path via --dataset_path flag in main.py
 
 
 
