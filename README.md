@@ -84,7 +84,7 @@ tar -xvzf adp_dataset.tar.gz
 
 > [!NOTE]
 >
-> The ADP_DATASET/ folder should be placed inside the dataset/ folder or scpecify the new path via --dataset_path flag in main.py
+> The ADP_DATASET/ folder should be placed inside the dataset/ folder or specify the new path via --dataset_path flag in main.py
 
 ### Jarvis
 For tasks derived from Jarvis datset, we folowed the methdology of [Choudhary et al.](https://www.nature.com/articles/s41524-021-00650-1) in ALIGNN, utilizing the same training, validation, and test datasets. The dataset is automatically downloaded and processed by the code.
