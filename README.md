@@ -1,4 +1,4 @@
-# Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Therma Ellipsoid Estimation
+# Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation
 
 ![Pipeline](./fig/pipeline.png)
 
