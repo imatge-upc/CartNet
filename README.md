@@ -84,10 +84,10 @@ tar -xvzf adp_dataset.tar.gz
 
 > [!NOTE]
 >
-> The ADP_DATASET/ folder should be placed inside the dataset/ folder or scpecify the new path via --dataset_path flag in main.py
+> The ADP_DATASET/ folder should be placed inside the dataset/ folder or specify the new path via --dataset_path flag in main.py
 
 ### Jarvis
-For tasks derived from Jarvis datset, we folowed the methdology of [Choudhary et al.](https://www.nature.com/articles/s41524-021-00650-1) in ALIGNN, utilizing the same training, validation, and test datasets. The dataset is automatically downloaded and processed by the code.
+For tasks derived from Jarvis dataset, we followed the methodology of [Choudhary et al.](https://www.nature.com/articles/s41524-021-00650-1) in ALIGNN, utilizing the same training, validation, and test datasets. The dataset is automatically downloaded and processed by the code.
 
 ### The Materials Project
 
@@ -203,7 +203,7 @@ Links to download pre-trained models:
 
 ## Known Issues
 
-Due to the presence of certain non-deterministic operations in PyTorch, as discussed [here](https://pytorch.org/docs/stable/notes/randomness.html), some results may not be fully reproducible or may exhibit slight variations. This variability can also arise when using different GPU models for training and testing the network.
+Due to the presence of certain non-deterministic operations in PyTorch, as discussed [here](https://pytorch.org/docs/stable/notes/randomness.html), some results may not be exactly reproducible and may exhibit slight variations. This variability can also arise when using different GPU models for training and testing the network.
 
 ## Citation
 
