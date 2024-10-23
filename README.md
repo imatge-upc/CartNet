@@ -1,4 +1,4 @@
-# CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation
+# Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Therma Ellipsoid Estimation
 
 ![Pipeline](./fig/pipeline.png)
 
