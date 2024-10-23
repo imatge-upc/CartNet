@@ -2,7 +2,8 @@
 
 ![Pipeline](./fig/pipeline.png)
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13969962.svg)](https://doi.org/10.5281/zenodo.13969962)
+
 
 
 ## Overview
