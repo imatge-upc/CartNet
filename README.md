@@ -14,7 +14,7 @@ Implementation of the CartNet model proposed in the paper:
 
 - **Paper**: [CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation](link_to_paper)
 - **Authors**: Àlex Solé, Albert Mosella-Montoro, Joan Cardona, Silvia Gómez-Coca, Daniel Aravena, Eliseo Ruiz and Javier Ruiz-Hidalgo
-- **Conference/Journal**: [Digital Discovery](https://www.rsc.org/journals-books-databases/about-journals/digital-discovery/), Year
+- **Journal**: [Digital Discovery](https://www.rsc.org/journals-books-databases/about-journals/digital-discovery/), Year
 
 ## Table of Contents
 
