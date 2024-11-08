@@ -1,3 +1,7 @@
+# Copyright Universitat Politècnica de Catalunya 2024 https://imatge.upc.edu
+# Distributed under the MIT License.
+# (See accompanying file README.md file or copy at http://opensource.org/licenses/MIT)
+
 import torch
 from dataset.datasetADP import DatasetADP
 from dataset.figshare_dataset import Figshare_Dataset
@@ -107,7 +111,6 @@ def create_loader():
     else:
         raise Exception("Dataset not implemented")
     
-    # cfg.batch = 32
     loaders = [
         DataLoader(dataset_train, batch_size=cfg.batch, persistent_workers=True,
                                   shuffle=True, num_workers=cfg.workers,

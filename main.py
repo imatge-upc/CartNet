@@ -1,3 +1,7 @@
+# Copyright Universitat Politècnica de Catalunya 2024 https://imatge.upc.edu
+# Distributed under the MIT License.
+# (See accompanying file README.md file or copy at http://opensource.org/licenses/MIT)
+
 import torch
 import logging
 import argparse
@@ -14,6 +18,16 @@ from torch_geometric.graphgym.logger import set_printing
 
 
 def inference(model, loader):
+    """
+    Run inference using the trained model and data loader, compute metrics, and save the results.
+    Args:
+        model (torch.nn.Module): The trained model to be evaluated.
+        loader (torch.utils.data.DataLoader): DataLoader for the dataset to perform inference on.
+    This function sets the model to evaluation mode and disables gradient calculations.
+    It iterates over the data loader, collects predictions and ground truths, and computes metrics such as IoU,
+    Mean Absolute Error (MAE), and similarity index for each batch. The metrics are logged, and all inference outputs
+    are saved to a pickle file specified by `cfg.inference_output`.
+    """
     from train.metrics import compute_loss, compute_3D_IoU, get_similarity_index
     model.eval()
     
@@ -45,6 +59,19 @@ def inference(model, loader):
         pickle.dump(inference_output, open(cfg.inference_output, "wb"))
 
 def montecarlo(model, loader):
+    """
+    Performs Monte Carlo simulations to evaluate the model's performance under random rotations.
+    Args:
+        model (torch.nn.Module): The trained model to be evaluated.
+        loader (torch.utils.data.DataLoader): DataLoader providing the dataset for evaluation.
+    The function runs multiple iterations (e.g., 100) where it:
+    - Applies a random rotation to the input batch data.
+    - Performs a forward pass to obtain predictions.
+    - Computes evaluation metrics such as Intersection over Union (IoU), Mean Absolute Error (MAE), and similarity index.
+    - Stores and logs the results for each iteration.
+    After all iterations, it aggregates the metrics to compute the mean and standard deviation, providing insights into the model's robustness to rotations.
+    Results are saved to output files specified in the configuration, and important metrics are logged for analysis.
+    """
     from train.metrics import compute_loss, compute_3D_IoU, get_similarity_index
     import roma
 

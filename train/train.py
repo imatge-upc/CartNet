@@ -1,3 +1,8 @@
+# Copyright Universitat Politècnica de Catalunya 2024 https://imatge.upc.edu
+# Distributed under the MIT License.
+# (See accompanying file README.md file or copy at http://opensource.org/licenses/MIT)
+
+
 import torch
 import logging
 import wandb
@@ -141,6 +146,20 @@ def train(model, loaders, optimizer, loggers):
 
 
 def train_epoch(logger, loader, model, optimizer, batch_accumulation, scheduler):
+    """
+    Train the model for one epoch.
+    Args:
+        logger (Logger): Logger object to log training information.
+        loader (DataLoader): DataLoader object providing the training data.
+        model (nn.Module): The model to be trained.
+        optimizer (Optimizer): Optimizer for updating the model parameters.
+        batch_accumulation (int): Number of batches to accumulate gradients before updating the model parameters.
+        scheduler (Scheduler): Learning rate scheduler.
+    Raises:
+        Exception: If the specified loss function is not implemented.
+    Returns:
+        None
+    """
     model.train()
     optimizer.zero_grad()
     
@@ -181,6 +200,18 @@ def train_epoch(logger, loader, model, optimizer, batch_accumulation, scheduler)
 
 
 def eval_epoch(logger, loader, model, test_metrics=False):
+    """
+    Evaluate the model for one epoch.
+    Args:
+        logger (Logger): Logger object for logging metrics and information.
+        loader (DataLoader): DataLoader object providing the dataset.
+        model (nn.Module): The model to be evaluated.
+        test_metrics (bool, optional): Flag to indicate if test metrics should be computed. Defaults to False.
+    Raises:
+        Exception: If the specified loss function in the configuration is not implemented.
+    Returns:
+        None
+    """
     model.eval()
     
     with torch.no_grad():
