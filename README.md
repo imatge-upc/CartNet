@@ -161,11 +161,11 @@ python main.py --inference --checkpoint_path path/to/checkpoint.pth
 
 Results on ADP Dataset:
 
-| Method      | MAE (Å²) ↓        | S₁₂ (%) ↓       | IoU (%) ↑       | #Params  |
+| Method      | MAE (Å²) ↓        | S₁₂ (%) ↓       | IoU (%) ↑       | #Params↓  |
 |-------------|-------------------|-----------------|-----------------|----------|
 | eComformer  | 6.21 · 10⁻³       | 2.47            | 74.34           | 5.55M    |
-| iComformer  | _3.22 · 10⁻³_     | _0.94_          | _81.97_         | 4.9M     |
-| CartNet     | **2.88 · 10⁻³**   | **0.75**        | **83.53**       | 2.5M     |
+| iComformer  | _3.22 · 10⁻³_     | _0.94_          | _81.97_         | _4.9M_   |
+| CartNet     | **2.88 · 10⁻³**   | **0.75**        | **83.53**       | **2.5M** |
 
 (best result in **bold** and second best in _italic_)
 
