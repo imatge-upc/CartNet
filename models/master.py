@@ -11,7 +11,8 @@ def create_model(invariant=False):
                         num_layers=cfg.num_layers, 
                         invariant=cfg.invariant, 
                         temperature=cfg.use_temp, 
-                        use_envelope=cfg.envelope, 
+                        use_envelope=cfg.envelope,
+                        atom_types=cfg.atom_types,
                         cholesky=True if cfg.dataset.name == "ADP" else False
                     ).to("cuda:0")
     
