@@ -1,3 +1,7 @@
+# Copyright Universitat Politècnica de Catalunya 2024 https://imatge.upc.edu
+# Distributed under the MIT License.
+# (See accompanying file README.md file or copy at http://opensource.org/licenses/MIT)
+
 import torch
 import torch.nn as nn
 import numpy as np
@@ -9,30 +13,95 @@ l1_loss = nn.L1Loss(reduction="none")
 mse_loss = nn.MSELoss(reduction="none")
 
 def compute_loss(pred, true):
+    """
+    Computes the Mean Absolute Error (MAE) and Mean Squared Error (MSE) between the predicted and true values.
+
+    Args:
+        pred (Tensor): The predicted values.
+        true (Tensor): The ground truth values.
+
+    Returns:
+        tuple: A tuple containing the MAE and MSE.
+    """
     MAE = l1_loss(pred, true)
     MSE = mse_loss(pred, true)
     return MAE, MSE
 
 def get_volume(A):
+    """
+    Calculate the volume of an ellipsoid given its covariance matrix.
+
+    Parameters:
+    A (torch.Tensor): A 3x3 covariance matrix representing the ellipsoid.
+
+    Returns:
+    float: The volume of the ellipsoid.
+    """
     return ((4.0 / 3.0) * np.pi * torch.sqrt(torch.det(A)))
 
 def get_error_volume(pred, true):
+    """
+    Calculate the error volume between the predicted and true values.
+
+    This function computes the absolute difference between the predicted volume
+    and the true volume, normalized by the true volume.
+
+    Args:
+        pred (torch.Tensor): The predicted values.
+        true (torch.Tensor): The ground truth values.
+
+    Returns:
+        torch.Tensor: The normalized error volume.
+    """
     volume_true = get_volume(pred)
     volume_pred = get_volume(true)
     return (torch.abs(volume_true - volume_pred)/(volume_true+SMOOTH))
 
 def get_KL(pred, true):
+    """
+    Computes the Kullback-Leibler (KL) divergence between two multivariate normal distributions.
+
+    Args:
+        pred (torch.Tensor): The predicted covariance matrix of shape (N, 3), where N is the number of samples.
+        true (torch.Tensor): The true covariance matrix of shape (N, 3), where N is the number of samples.
+
+    Returns:
+        torch.Tensor: The KL divergence between the predicted and true distributions.
+    """
     p = torch.distributions.multivariate_normal.MultivariateNormal(torch.zeros(true.shape[0],3, device=true.device), true)
     q = torch.distributions.multivariate_normal.MultivariateNormal(torch.zeros(pred.shape[0],3, device=true.device), pred)
 
     return torch.distributions.kl.kl_divergence(p, q)
 
 def get_similarity_index(pred, true):
+    """
+    Calculate the similarity index between two matrices.
+    https://doi.org/10.1107/S0108768106020787
+
+
+    This function computes a similarity index based on the determinants of the 
+    inverses of the input matrices. The similarity index is scaled to a percentage.
+
+    Args:
+        pred (torch.Tensor): The predicted matrix.
+        true (torch.Tensor): The true matrix.
+
+    Returns:
+        float: The similarity index as a percentage.
+    """
     r12_num = 2 ** (3 / 2) * torch.linalg.det(torch.linalg.inv(true) @ torch.linalg.inv(pred)) ** (1 / 4)
     r12_den = torch.linalg.det(torch.linalg.inv(true) + torch.linalg.inv(pred)) ** (1 / 2)
     return 100*(1-r12_num/r12_den)
 
 def iou_pytorch3D(outputs: torch.Tensor, labels: torch.Tensor):
+    """
+    Calculate the Intersection over Union (IoU) for 3D tensors using PyTorch.
+    Args:
+        outputs (torch.Tensor): The predicted binary masks with shape (batch_size, depth, height, width).
+        labels (torch.Tensor): The ground truth binary masks with shape (batch_size, depth, height, width).
+    Returns:
+        torch.Tensor: The IoU for each sample in the batch.
+    """
 
     intersection = (outputs & labels).float().sum((1, 2, 3))  # Will be zero if Truth=0 or Prediction=0
     
@@ -42,8 +111,19 @@ def iou_pytorch3D(outputs: torch.Tensor, labels: torch.Tensor):
     
     return iou
 
-def get_ellipsoids(covariance_matrices):
-    num_points = 64
+def get_ellipsoids(covariance_matrices, num_points=64):
+    """
+    Generate ellipsoid masks based on given covariance matrices.
+    Args:
+        covariance_matrices (torch.Tensor): A batch of covariance matrices of shape (N, 3, 3),
+                                            where N is the number of matrices.
+        num_points (int, optional): The number of points to generate along each axis for the grid.
+                                    Default is 64.
+    Returns:
+        torch.Tensor: A tensor of shape (N, num_points, num_points, num_points) containing boolean
+                      masks where True indicates points inside the ellipsoid defined by the corresponding
+                      covariance matrix.
+    """
     device = covariance_matrices.device
     num_matrices = covariance_matrices.shape[0]
 
@@ -73,7 +153,14 @@ def get_ellipsoids(covariance_matrices):
 
 
 def compute_3D_IoU(pred,true):
-    device = true.device
+    """
+    Computes the 3D Intersection over Union (IoU) between predicted and true 3D bounding boxes.
+    Args:
+        pred (torch.Tensor): The predicted 3D bounding boxes.
+        true (torch.Tensor): The ground truth 3D bounding boxes.
+    Returns:
+        float: The IoU score between the predicted and true 3D bounding boxes.
+    """
     matrix_norm_pred = torch.linalg.matrix_norm(pred)
     matrix_norm_true = torch.linalg.matrix_norm(true)
 
@@ -93,6 +180,21 @@ def compute_3D_IoU(pred,true):
     return iou
 
 def compute_metrics_and_logging(pred, true, mae, mse, loss, lr, time_used, logger, test_metrics=False):
+    """
+    Compute metrics and log the results using the provided logger.
+    Parameters:
+    pred (torch.Tensor): Predicted values.
+    true (torch.Tensor): Ground truth values.
+    mae (torch.Tensor): Mean Absolute Error.
+    mse (torch.Tensor): Mean Squared Error.
+    loss (torch.Tensor): Loss value.
+    lr (float): Learning rate.
+    time_used (float): Time used for the computation.
+    logger (Logger): Logger object to update the stats.
+    test_metrics (bool, optional): Flag to indicate if test metrics should be computed. Defaults to False.
+    Returns:
+    None
+    """
     
     if cfg.dataset.name == "ADP":
         if test_metrics:

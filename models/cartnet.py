@@ -1,3 +1,7 @@
+# Copyright Universitat Politècnica de Catalunya 2024 https://imatge.upc.edu
+# Distributed under the MIT License.
+# (See accompanying file README.md file or copy at http://opensource.org/licenses/MIT)
+
 import torch
 import torch_geometric.nn as pyg_nn
 import torch.nn as nn
@@ -9,10 +13,26 @@ from models.utils import ExpNormalSmearing, CosineCutoff
 
 class CartNet(torch.nn.Module):
     """
-    CartNet's architecture. 
-    From "CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation"
-
+    CartNet model from Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation.
+    Args:
+        dim_in (int): Dimensionality of the input features.
+        dim_rbf (int): Dimensionality of the radial basis function embeddings.
+        num_layers (int): Number of CartNet layers in the model.
+        radius (float, optional): Radius cutoff for neighbor interactions. Default is 5.0.
+        invariant (bool, optional): If `True`, enforces rotational invariance in the encoder. Default is `False`.
+        temperature (bool, optional): If `True`, includes temperature information in the encoder. Default is `True`.
+        use_envelope (bool, optional): If `True`, applies an envelope function to the interactions. Default is `True`.
+        cholesky (bool, optional): If `True`, uses a Cholesky head for the output. If `False`, uses a scalar head. Default is `True`.
+    Methods:
+        forward(batch):
+            Performs a forward pass of the model.
+            Args:
+                batch: A batch of input data.
+            Returns:
+                pred: The model's predictions.
+                true: The ground truth values corresponding to the input batch.
     """
+
 
     def __init__(self, 
         dim_in: int, 
@@ -54,8 +74,27 @@ class CartNet(torch.nn.Module):
 
 class Encoder(torch.nn.Module):
     """
-    Atom and Edge encoder from CartNet
+    Encoder module for the CartNet model.
+    This module encodes node and edge features for input into the CartNet model, incorporating optional temperature information and rotational invariance.
+    Args:
+        dim_in (int): Dimension of the input features after embedding.
+        dim_rbf (int): Dimension of the radial basis function used for edge attributes.
+        radius (float, optional): Cutoff radius for neighbor interactions. Defaults to 5.0.
+        invariant (bool, optional): If True, the encoder enforces rotational invariance by excluding directional information from edge attributes. Defaults to False.
+        temperature (bool, optional): If True, includes temperature data in the node embeddings. Defaults to True.
+    Attributes:
+        dim_in (int): Dimension of the input features.
+        invariant (bool): Indicates if rotational invariance is enforced.
+        temperature (bool): Indicates if temperature information is included.
+        embedding (nn.Embedding): Embedding layer mapping atomic numbers to feature vectors.
+        temperature_proj_atom (pyg_nn.Linear): Linear layer projecting temperature to embedding dimensions (used if temperature is True).
+        bias (nn.Parameter): Bias term added to embeddings (used if temperature is False).
+        activation (nn.Module): Activation function (SiLU).
+        encoder_atom (nn.Sequential): Sequential network encoding node features.
+        encoder_edge (nn.Sequential): Sequential network encoding edge features.
+        rbf (ExpNormalSmearing): Radial basis function for encoding distances.
     """
+    
     def __init__(
         self,
         dim_in: int,
@@ -123,7 +162,19 @@ class Encoder(torch.nn.Module):
 
 class CartNet_layer(pyg_nn.conv.MessagePassing):
     """
-    CartNet layer
+    The message-passing layer used in the CartNet architecture.
+    Parameters:
+        dim_in (int): Dimension of the input node features.
+        use_envelope (bool, optional): If True, applies an envelope function to the distances. Defaults to True.
+    Attributes:
+        dim_in (int): Dimension of the input node features.
+        activation (nn.Module): Activation function (SiLU) used in the layer.
+        MLP_aggr (nn.Sequential): MLP used for aggregating messages.
+        MLP_gate (nn.Sequential): MLP used for computing gating coefficients.
+        norm (nn.BatchNorm1d): Batch normalization applied to the gating coefficients.
+        norm2 (nn.BatchNorm1d): Batch normalization applied to the aggregated messages.
+        use_envelope (bool): Indicates if the envelope function is used.
+        envelope (CosineCutoff): Envelope function applied to the distances.
     """
     
     def __init__(self, 
@@ -224,8 +275,13 @@ class CartNet_layer(pyg_nn.conv.MessagePassing):
 
 class Cholesky_head(torch.nn.Module):
     """
-    Cholesky head
+    The Cholesky head used in the CartNet model.
+    It enforce the positive definiteness of the output covariance matrix.
+
+    Args:
+        dim_in (int): The input dimension of the features.
     """
+    
     def __init__(self, 
         dim_in: int
     ):
@@ -240,7 +296,7 @@ class Cholesky_head(torch.nn.Module):
         diag_elements = F.softplus(pred[:, :3])
 
         i,j = torch.tensor([0,1,2,0,0,1]), torch.tensor([0,1,2,1,2,2])
-        L_matrix = torch.zeros(pred.size(0),3,3, device=pred.device)
+        L_matrix = torch.zeros(pred.size(0),3,3, device=pred.device, dtype=pred.dtype)
         L_matrix[:,i[:3], i[:3]] = diag_elements
         L_matrix[:,i[3:], j[3:]] = pred[:,3:]
 
@@ -250,8 +306,11 @@ class Cholesky_head(torch.nn.Module):
 
 class Scalar_head(torch.nn.Module):
     """
-    Scalar head
+    A head to predict scalar values.
+    Args:
+        dim_in (int): The dimension of the input features.
     """
+    
     def __init__(self,
         dim_in
     ):

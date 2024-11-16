@@ -1,8 +1,24 @@
+# Copyright Universitat Politècnica de Catalunya 2024 https://imatge.upc.edu
+# Distributed under the MIT License.
+# (See accompanying file README.md file or copy at http://opensource.org/licenses/MIT)
+
 import torch
 from torch_geometric.graphgym.config import cfg
 
 
-def create_model(invariant=False):
+def create_model():
+    """
+    Creates and returns a model based on the configuration specified in `cfg`.
+
+    Returns:
+    model: An instance of the specified model class, moved to the CUDA device.
+    Raises:
+    Exception: If the specified model in `cfg.model` is not implemented.
+    Notes:
+    - If `cfg.model` is "CartNet", it imports and initializes a `CartNet` model with parameters from `cfg`.
+    - If `cfg.model` is "ecomformer", it imports and initializes an `eComformer` model, ensuring the dataset is "ADP".
+    - If `cfg.model` is "icomformer", it imports and initializes an `iComformer` model, ensuring the dataset is "ADP".
+    """
    
     if cfg.model == "CartNet":
         from models.cartnet import CartNet
