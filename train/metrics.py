@@ -9,8 +9,8 @@ from torch_geometric.graphgym.config import cfg
 
 # Metrics Config
 SMOOTH = 1e-8
-l1_loss = nn.L1Loss(reduction="none")
-mse_loss = nn.MSELoss(reduction="none")
+l1_loss = nn.L1Loss(reduction="mean")
+mse_loss = nn.MSELoss(reduction="mean")
 
 def compute_loss(pred, true):
     """
@@ -179,6 +179,7 @@ def compute_3D_IoU(pred,true):
 
     return iou
 
+@torch.no_grad()
 def compute_metrics_and_logging(pred, true, mae, mse, loss, lr, time_used, logger, test_metrics=False):
     """
     Compute metrics and log the results using the provided logger.

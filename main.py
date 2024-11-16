@@ -3,6 +3,7 @@
 # (See accompanying file README.md file or copy at http://opensource.org/licenses/MIT)
 
 import torch
+import torch.nn.functional as F
 import logging
 import argparse
 import pickle
@@ -28,7 +29,7 @@ def inference(model, loader):
     Mean Absolute Error (MAE), and similarity index for each batch. The metrics are logged, and all inference outputs
     are saved to a pickle file specified by `cfg.inference_output`.
     """
-    from train.metrics import compute_loss, compute_3D_IoU, get_similarity_index
+    from train.metrics import compute_3D_IoU, get_similarity_index
     model.eval()
     
     with torch.no_grad():
@@ -44,7 +45,7 @@ def inference(model, loader):
             inference_output["pred"].append(_pred.detach().to("cpu"))
             inference_output["true"].append(_true.detach().to("cpu"))
             inference_output["iou"].append(compute_3D_IoU(_pred, _true).detach().to("cpu"))
-            inference_output["mae"].append(compute_loss(_pred, _true)[0].detach().to("cpu"))
+            inference_output["mae"].append(F.l1_loss(_pred,_true, reduce="none").detach().to("cpu"))
             inference_output["similarity_index"].append(get_similarity_index(_pred, _true).detach().to("cpu"))
         
         
@@ -72,7 +73,7 @@ def montecarlo(model, loader):
     After all iterations, it aggregates the metrics to compute the mean and standard deviation, providing insights into the model's robustness to rotations.
     Results are saved to output files specified in the configuration, and important metrics are logged for analysis.
     """
-    from train.metrics import compute_loss, compute_3D_IoU, get_similarity_index
+    from train.metrics import compute_3D_IoU, get_similarity_index
     import roma
 
     model.eval()
@@ -99,7 +100,7 @@ def montecarlo(model, loader):
                 inference_output["true"].append(pseudo_true.detach().to("cpu"))
                 inference_output["iou"].append(compute_3D_IoU(pred, pseudo_true).detach().to("cpu"))
                 inference_output["similarity_index"].append(get_similarity_index(pred, pseudo_true).detach().to("cpu"))
-                inference_output["mae"].append(compute_loss(pred, pseudo_true)[0].detach().to("cpu"))
+                inference_output["mae"].append(F.l1_loss(pred, pseudo_true, reduce="none").detach().to("cpu"))
             pickle.dump(inference_output, open(cfg.inference_output.replace(".pkl", "_montecarlo_"+str(i)+".pkl"), "wb"))
             logging.info(f"Montecarlo {i}")
             logging.info(f"IoU: {torch.cat(inference_output['iou'], dim=0).mean().item()}")

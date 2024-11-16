@@ -191,9 +191,9 @@ def train_epoch(logger, loader, model, optimizer, batch_accumulation, scheduler)
 
         compute_metrics_and_logging(pred = pred.detach(), 
                                     true = true.detach(), 
-                                    mae = MAE, 
-                                    mse = MSE,
-                                    loss = loss,
+                                    mae = MAE.detach(), 
+                                    mse = MSE.detach(),
+                                    loss = loss.detach(),
                                     lr = optimizer.param_groups[0]['lr'], 
                                     time_used = time.time()-time_start, 
                                     logger = logger)
@@ -234,9 +234,9 @@ def eval_epoch(logger, loader, model, test_metrics=False):
 
             compute_metrics_and_logging(pred = pred.detach(), 
                                         true = true.detach(), 
-                                        mae = MAE, 
-                                        mse = MSE,
-                                        loss = loss,
+                                        mae = MAE.detach(), 
+                                        mse = MSE.detach(),
+                                        loss = loss.detach(),
                                         lr = 0, 
                                         time_used = time.time()-time_start, 
                                         logger = logger,
