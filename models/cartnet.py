@@ -22,10 +22,11 @@ class CartNet(torch.nn.Module):
         invariant: bool = False,
         temperature: bool = True, 
         use_envelope: bool = True,
+        atom_types: bool = True,
         cholesky: bool = True):
         super().__init__()
     
-        self.encoder = Encoder(dim_in, dim_rbf=dim_rbf, radius=radius, invariant=invariant, temperature=temperature)
+        self.encoder = Encoder(dim_in, dim_rbf=dim_rbf, radius=radius, invariant=invariant, temperature=temperature, atom_types=atom_types)
         self.dim_in = dim_in
 
         layers = []
@@ -62,20 +63,27 @@ class Encoder(torch.nn.Module):
         radius: float = 5.0,
         invariant: bool = False, 
         temperature: bool = True,
+        atom_types: bool = True
     ):
         super(Encoder, self).__init__()
         self.dim_in = dim_in
         self.invariant = invariant
         self.temperature = temperature
-        self.embedding = nn.Embedding(119, self.dim_in*2)
+        self.atom_types = atom_types
+        if self.atom_types:
+            self.embedding = nn.Embedding(119, self.dim_in*2)
+            torch.nn.init.xavier_uniform_(self.embedding.weight.data)
+        elif not self.temperature:
+            self.embedding = nn.Embedding(1, self.dim_in)
+
         if self.temperature:
             self.temperature_proj_atom = pyg_nn.Linear(1, self.dim_in*2, bias=True)
-        else:
+        elif self.atom_types:
             self.bias = nn.Parameter(torch.zeros(self.dim_in*2))
         self.activation = nn.SiLU(inplace=True)
         
-       
-        self.encoder_atom = nn.Sequential(self.activation,
+        if self.temperature or self.atom_types:
+            self.encoder_atom = nn.Sequential(self.activation,
                                         pyg_nn.Linear(self.dim_in*2, self.dim_in),
                                         self.activation)
         if self.invariant:
@@ -90,16 +98,21 @@ class Encoder(torch.nn.Module):
 
         self.rbf = ExpNormalSmearing(0.0,radius,dim_rbf,False)  
         
-        torch.nn.init.xavier_uniform_(self.embedding.weight.data)
+        
 
     def forward(self, batch):
 
-        if self.temperature:
+        if self.temperature and self.atom_types:
             x = self.embedding(batch.x) + self.temperature_proj_atom(batch.temperature.unsqueeze(-1))[batch.batch]
-        else:
+        elif not self.temperature and self.atom_types:
             x = self.embedding(batch.x) + self.bias
+        elif self.temperature and not self.atom_types:
+            x = self.temperature_proj_atom(batch.temperature.unsqueeze(-1))[batch.batch]
+        else:
+            batch.x = self.embedding.weight.repeat(batch.x.shape[0],1)
         
-        batch.x = self.encoder_atom(x)
+        if self.temperature or self.atom_types:
+            batch.x = self.encoder_atom(x)
 
         if cfg.invariant:
             batch.edge_attr = self.encoder_edge(self.rbf(batch.cart_dist))
