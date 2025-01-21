@@ -77,13 +77,7 @@ These dependencies are automatically installed when you create the Conda environ
 
 The ADP (Anisotropic Displacement Parameters) dataset is curated from over 200,000 experimental crystal structures from the Cambridge Structural Database (CSD). This dataset is used to study atomic thermal vibrations represented through thermal ellipsoids. The dataset was curated to ensure high-quality and reliable ADPs. The dataset spans a wide temperature range (0K to 600K) and features a variety of atomic environments, with an average of 194.2 atoms per crystal structure. The dataset is split into 162,270 structures for training, 22,219 for validation, and 23,553 for testing.
 
-The ADP dataset can be downloaded from the following [link](https://drive.google.com/file/d/1lCKGG0Jtd7tjxmj1TgPkN8D_8uXXKlKF/view?usp=sharing).
-
-The dataset can be extracted using:
-
-```bash
-tar -xvzf adp_dataset.tar.gz
-```
+Code to create the dataset comming soon
 
 > [!NOTE]
 >
@@ -163,11 +157,11 @@ python main.py --inference --checkpoint_path path/to/checkpoint.pth
 
 Results on ADP Dataset:
 
-| Method      | MAE (Å²) ↓        | S₁₂ (%) ↓       | IoU (%) ↑       | #Params↓  |
-|-------------|-------------------|-----------------|-----------------|----------|
-| eComformer  | 6.21 · 10⁻³       | 2.47            | 74.34           | 5.55M    |
-| iComformer  | _3.22 · 10⁻³_     | _0.94_          | _81.97_         | _4.9M_   |
-| CartNet     | **2.88 · 10⁻³**   | **0.75**        | **83.53**       | **2.5M** |
+| Method      | MAE (Å²) ↓               | S₁₂ (%) ↓         | IoU (%) ↑          | #Params↓  |
+|-------------|-------------------------|-------------------|-------------------|-----------|
+| eComformer  | 6.22 · 10⁻³ ± 0.01 · 10⁻³ | 2.46 ± 0.01      | 74.22 ± 0.06     | 5.55M     |
+| iComformer  | _3.22 · 10⁻³ ± 0.02 · 10⁻³_ | _0.91 ± 0.01_    | _81.92 ± 0.18_   | _4.9M_    |
+| CartNet     | **2.87 · 10⁻³ ± 0.01 · 10⁻³** | **0.75 ± 0.01** | **83.56 ± 0.01** | **2.5M**  |
 
 (best result in **bold** and second best in _italic_)
 
@@ -180,7 +174,7 @@ Results on Jarvis Dataset:
 | PotNet      | 29.4                      | 127                    | 32                        | 270                    | 55            |
 | eComformer  | 28.4                      | 124                    | 32                        | 280                    | *44*          |
 | iComformer  | *27.2*                    | *122*                  | *28.8*                    | *260*                  | 47            |
-| CartNet     | **27.03**                 | **111.2**              | **26.26**                 | **247**                | **43.54**     |
+| CartNet     | **27.05 ± 0.07**         | **115.31 ± 3.36**     | **26.58 ± 0.28**         | **253.03 ± 5.20**      | **43.90 ± 0.36** |
 
 (best result in **bold** and second best in _italic_)
 
@@ -189,10 +183,10 @@ Results on Jarvis Dataset:
 | Method      | Form. Energy (meV/atom) ↓ | Band Gap (meV) ↓ | Bulk Moduli (log(GPa)) ↓ | Shear Moduli (log(GPa)) ↓ |
 |-------------|---------------------------|------------------|--------------------------|--------------------------|
 | Matformer   | 21                        | 211              | 0.043                    | 0.073                    |
-| PotNet      | 18.8                      | 204              | 0.04                     | 0.065                    |
-| eComformer  | *18.16*                   | 202              | 0.0417                   | 0.0729                   |
-| iComformer  | 18.26                     | *193*            | *0.038*                  | *0.0637*                 |
-| CartNet     | **16.95**                 | **186**          | **0.0321**               | **0.0628**               |
+| PotNet      | 18.8                      | 204              | 0.040                    | _0.065_                  |
+| eComformer  | _18.16_                   | 202              | 0.0417                   | 0.0729                   |
+| iComformer  | 18.26                     | _193_            | _0.038_                  | **0.0637**               |
+| CartNet     | **17.47 ± 0.38**         | **190.79 ± 3.14** | **0.033 ± 0.00094**    | **0.0637 ± 0.0008**     |
 
 (best result in **bold** and second best in _italic_)
 
