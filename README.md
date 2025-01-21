@@ -8,7 +8,7 @@
 
 <h3 align="center">
   🌐 <a href="https://imatge-upc.github.io/CartNet/" target="_blank">Project</a> | 
-  📃 <a href="" target="_blank">Paper</a> | 
+  📃 <a href="https://imatge-upc.github.io/CartNet/static/pdfs/CartNet.pdf" target="_blank">Paper</a> | 
   🤗 <a href="https://huggingface.co/spaces/alexsoleg/cartnet-demo" target="_blank">Demo</a>
 </h3>
 
@@ -21,7 +21,7 @@ CartNet is specifically designed for predicting Anisotropic Displacement Paramet
 
 Implementation of the CartNet model proposed in the paper:
 
-- **Paper**: [CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation](link_to_paper)
+- **Paper**: [CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation](https://imatge-upc.github.io/CartNet/static/pdfs/CartNet.pdf)
 - **Authors**: Àlex Solé, Albert Mosella-Montoro, Joan Cardona, Silvia Gómez-Coca, Daniel Aravena, Eliseo Ruiz and Javier Ruiz-Hidalgo
 - **Journal**: [Digital Discovery](https://www.rsc.org/journals-books-databases/about-journals/digital-discovery/), Year
 
