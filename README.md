@@ -21,7 +21,7 @@ CartNet is specifically designed for predicting Anisotropic Displacement Paramet
 
 Implementation of the CartNet model proposed in the paper:
 
-- **Paper**: [CartNet: Cartesian Encoding for Anisotropic Displacement Parameters Estimation](https://imatge-upc.github.io/CartNet/static/pdfs/CartNet.pdf)
+- **Paper**: [Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation](https://imatge-upc.github.io/CartNet/static/pdfs/CartNet.pdf)
 - **Authors**: Àlex Solé, Albert Mosella-Montoro, Joan Cardona, Silvia Gómez-Coca, Daniel Aravena, Eliseo Ruiz and Javier Ruiz-Hidalgo
 - **Journal**: [Digital Discovery](https://www.rsc.org/journals-books-databases/about-journals/digital-discovery/), Year
 
