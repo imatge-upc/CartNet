@@ -1,14 +1,22 @@
 # Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation
 
-![Pipeline](./fig/pipeline.png)
+![Pipeline](./fig/frontpage.png)
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.13969962.svg)](https://doi.org/10.5281/zenodo.13969962)
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) 
 
-### CartNet online demo available at: [CartNet Web App](https://cartnet-adp-estimation.streamlit.app)
+
+
+<h3 align="center">
+  🌐 <a href="https://imatge-upc.github.io/CartNet/" target="_blank">Project</a> | 
+  📃 <a href="" target="_blank">Paper</a> | 
+  🤗 <a href="https://huggingface.co/spaces/alexsoleg/cartnet-demo" target="_blank">Demo</a>
+</h3>
+
+
 
 
 ## Overview
-CartNet is specifically designed for predicting Anisotropic Displacement Parameters (ADPs) in crystal structures. CartNet addresses the computational challenges of traditional methods by encoding the full 3D geometry of atomic structures into a Cartesian reference frame, bypassing the need for unit cell encoding. The model incorporates innovative features, including a neighbour equalization technique to enhance interaction detection and a Cholesky-based output layer to ensure valid ADP predictions. Additionally, it introduces a rotational SO(3) data augmentation technique to improve generalization across different crystal structure orientations, making the model highly efficient and accurate in predicting ADPs while significantly reducing computational costs.
+CartNet is specifically designed for predicting Anisotropic Displacement Parameters (ADPs) in crystal structures. CartNet addresses the computational challenges of traditional methods by encoding the entire 3D geometry of atomic structures into a Cartesian reference frame instead of encoding based on only distance, bypassing the need for unit cell encoding. The model incorporates innovative features, including a neighbour equalization technique to enhance interaction detection and a Cholesky-based output layer to ensure valid ADP predictions. Additionally, it introduces a rotational SO(3) data augmentation technique to improve generalization across different crystal structure orientations, making the model highly efficient and accurate in predicting ADPs while significantly reducing computational costs.
 
 
 Implementation of the CartNet model proposed in the paper:
