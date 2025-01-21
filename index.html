@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description" content="CartNet: A graph neural network for crystal structure property prediction, focusing on thermal ellipsoid estimation via Anisotropic Displacement Parameters (ADPs)">
+  <meta property="og:title" content="CartNet: Cartesian Encoding Graph Neural Network for Crystal Structures"/>
+  <meta property="og:description" content="A novel GNN architecture that efficiently predicts crystal structure properties by encoding atomic structural geometry to cartesian axes"/>
+  <meta property="og:url" content="https://imatge-upc.github.io/CartNet/"/>
+  <meta property="og:image" content="static/images/frontpage.png" />
+  <meta property="og:image:width" content="1200"/>
+  <meta property="og:image:height" content="630"/>
+
+  <meta name="twitter:title" content="CartNet: Crystal Structure Property Prediction">
+  <meta name="twitter:description" content="Efficient prediction of Anisotropic Displacement Parameters and other crystal properties using graph neural networks">
+  <meta name="twitter:image" content="static/images/frontpage.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="keywords" content="crystal structures, graph neural networks, machine learning, materials science, thermal ellipsoids, ADP prediction, computational chemistry">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <title>CartNet</title>
+  <link rel="icon" type="image/x-icon" href="static/images/favicon.ico">
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  rel="stylesheet">
+
+  <link rel="stylesheet" href="static/css/bulma.min.css">
+  <link rel="stylesheet" href="static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="static/css/index.css">
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script src="https://documentcloud.adobe.com/view-sdk/main.js"></script>
+  <script defer src="static/js/fontawesome.all.min.js"></script>
+  <script src="static/js/bulma-carousel.min.js"></script>
+  <script src="static/js/bulma-slider.min.js"></script>
+  <script src="static/js/index.js"></script>
+</head>
+<body>
+
+
+  <section class="hero">
+    <div class="hero-body">
+      <div class="container is-max-desktop">
+        <div class="columns is-centered">
+          <div class="column has-text-centered">
+            <h1 class="title is-1 publication-title">Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation</h1>
+            <div class="is-size-5 publication-authors">
+              <!-- Paper authors -->
+              <span class="author-block">
+                <a href="https://www.linkedin.com/in/alex-sole-gomez" target="_blank">Àlex Solé</a><sup>1,2</sup>,</span>
+                <span class="author-block">
+                  <a href="https://www.albertmosellamontoro.com/" target="_blank">Albert Mosella-Montoro</a><sup>1</sup>,</span>
+                  <span class="author-block">
+                  <a href="https://www.linkedin.com/in/joan-cardona-olives-7997951ab/" target="_blank">Joan Cardona</a><sup>2</sup>,</span>
+                  <span class="author-block">
+                  <a href="https://www.ee.ub.edu/silvia-gomez/" target="_blank">Silvia Gómez-Coca</a><sup>2</sup>,</span>
+                  <span class="author-block">
+                  <a href="https://www.quimicaybiologia.usach.cl/academico/aravena-ponce-daniel-alejandro/crear-persona" target="_blank">Daniel Aravena</a><sup>3</sup>,</span>
+                  <span class="author-block">
+                  <a href="https://www.ee.ub.edu/eliseo-ruiz/" target="_blank">Eliseo Ruiz</a><sup>2</sup>,</span>
+                  <span class="author-block">
+                  <a href="https://imatge.upc.edu/web/people/javier-ruiz-hidalgo" target="_blank">Javier Ruiz-Hidalgo </a><sup>1</sup>
+                  </span>
+                  </div>
+
+                  <div class="is-size-5 publication-authors">
+                    <span class="author-block"><sup>1</sup> Image Processing Group - Signal Theory and Communications Department, <br>Universitat Politècnica de Catalunya, Barcelona, Spain</span>
+                    <span class="author-block"><sup>2</sup> Inorganic and Organic Chemistry Department and Institute of Theoretical and Computational Chemistry, <br> Universitat de Barcelona, Barcelona, Spain</span>
+                    <span class="author-block"><sup>3</sup> Materials Chemistry Department, Faculty of Chemistry and Biology, <br>Universidad de Santiago de Chile, Santiago, Chile</span>
+                    <!-- <span class="eql-cntrb"><small><br><sup>*</sup>Indicates Equal Contribution</small></span> -->
+                  </div>
+
+                  <div class="column has-text-centered">
+                    <div class="publication-links">
+                         <!-- Arxiv PDF link -->
+                      <span class="link-block">
+                        <a href="static/pdfs/CartNet.pdf" target="_blank"
+                        class="external-link button is-normal is-rounded is-dark">
+                        <span class="icon">
+                          <i class="fas fa-file-pdf"></i>
+                        </span>
+                        <span>Paper</span>
+                      </a>
+                    </span>
+
+                    <!-- Supplementary PDF link -->
+                    <span class="link-block">
+                      <a href="static/pdfs/SI_CartNet.pdf" target="_blank"
+                      class="external-link button is-normal is-rounded is-dark">
+                      <span class="icon">
+                        <i class="fas fa-file-pdf"></i>
+                      </span>
+                      <span>Supplementary</span>
+                    </a>
+                  </span>
+
+                  <!-- Github link -->
+                  <span class="link-block">
+                    <a href="https://github.com/imatge-upc/CartNet" target="_blank"
+                    class="external-link button is-normal is-rounded is-dark">
+                    <span class="icon">
+                      <i class="fab fa-github"></i>
+                    </span>
+                    <span>Code</span>
+                  </a>
+                  <!-- Web Demo link -->
+                  <span class="link-block"></span>
+                  <a href="https://huggingface.co/spaces/alexsoleg/cartnet-demo" target="_blank"
+                  class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <img src="static/images/1F917.svg" alt="hugging face" style="height: 1em; filter: invert(1);">
+                  </span>
+                  <span>Web Demo</span>
+                  </a>
+                  </span>
+            </span>  
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Teaser image-->
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <img src="static/images/frontpage.png" alt="Frontpage image">
+      <h2 class="subtitle has-text-centered">
+        CartNet efficiently predicts Anisotropic Displacement Parameters (ADPs) for crystal structures, significantly reducing computational costs and outperforming the tested theoretical methods while achieving state-of-the-art accuracy across diverse datasets.
+      </h2>
+    </div>
+  </div>
+</section>
+<!-- End teaser video -->
+
+<!-- Paper abstract -->
+<section class="section hero is-light">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            In the diffraction resolution of crystal structures, the thermal ellipsoids are a critical parameter that is usually more difficult to determine than atomic positions. These ellipsoids are quantified through the Anisotropic Displacement Parameters (ADPs), which provide critical insights into atomic vibrations within crystalline structures. ADPs reflect the thermal behaviour and structural properties of crystal structures. However, traditional methods to compute ADPs are computationally intensive. This paper presents CartNet, a novel graph neural network (GNN) architecture designed to predict properties of crystal structures efficiently by encoding the atomic structural geometry to the cartesian axes and the temperature of the crystal structure. Additionally, CartNet employs a neighbour equalization technique for message passing to help emphasise the covalent and contact interactions, and a novel Cholesky-based head to ensure valid ADP predictions. Furthermore, a rotational SO(3) data augmentation technique has been proposed during the training phase to generalize unseen rotations. To corroborate such procedure, an ADP dataset with over 200,000 experimental crystal structures from the Cambridge Structural Database (CSD) has been curated. The model significantly reduces computational costs and outperforms existing previously resported methods in ADP prediction by 10.87%, while demonstrating a 34.77% improvement over the tested theoretical computation methods. Moreover, we have employed CartNet for other already known datasets that included different material properties, such as formation energy, band gap, total energy, energy above the convex hull, bulk moduli, and shear moduli. The proposed architecture outperformed previously reported methods by 7.71% in the Jarvis Dataset and 13.16% in the Materials Project Dataset, proving CarNet's capability to achieve state-of-the-art results in several tasks.
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- End paper abstract -->
+
+
+<!-- Results -->
+<section class="hero is-small">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Results</h2>
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h3 class="subtitle is-5">ADP Dataset</h3>
+          <p class="has-text-justified">
+            We have curated a comprehensive dataset of over 200,000 experimental crystal structures from the Cambridge Structural Database (CSD) to validate our approach. The dataset focuses on high-quality structures with R-factors below 5%, no disorder, with a unique molecule type in the unit cell, ensuring reliable experimental ADPs for training and evaluation.
+          </p>
+          <div style="height: 1cm"></div>
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-narrow is-fullwidth">
+              <caption class="has-text-justified">Results for the different tested architectures in the test split from the ADP Dataset. Best result in <strong>bold</strong> and second best <u>underlined</u>. Arrows indicate the direction of improvement for each metric.</caption>
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>MAE (Å²)↓</th>
+                  <th>S₁₂ (%)↓</th>
+                  <th>IoU (%)↑</th>
+                  <th>#Params↓</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                    <td><a href="https://arxiv.org/pdf/2403.11857" target="_blank">eComformer</a></td>
+                  <td>6.22 × 10⁻³ ± 0.01 × 10⁻³</td>
+                  <td>2.46 ± 0.01</td>
+                  <td>74.22 ± 0.06</td>
+                  <td>5.55M</td>
+                </tr>
+                <tr>
+                    <td><a href="https://arxiv.org/pdf/2403.11857" target="_blank">iComformer</a></td>
+                  <td><u>3.22 × 10⁻³ ± 0.02 × 10⁻³</u></td>
+                  <td><u>0.91 ± 0.01</u></td>
+                  <td><u>81.92 ± 0.18</u></td>
+                  <td><u>4.9M</u></td>
+                </tr>
+                <tr>
+                  <td>CartNet</td>
+                  <td><strong>2.87 × 10⁻³ ± 0.01 × 10⁻³</strong></td>
+                  <td><strong>0.75 ± 0.01</strong></td>
+                  <td><strong>83.56 ± 0.01</strong></td>
+                  <td><strong>2.5M</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="height: 1cm"></div>
+          <h3 class="subtitle is-5">CartNet vs DFT comparative</h3>
+
+          <img src="static/images/17_ETIDEQ_DFT_CartNet_paper.png" alt="Results comparison">
+            <h2 class="subtitle has-text-justified">
+            Thermal ellipsoids representations from experimental ADPs for the 5,5'-dimethyl-2,2'-bipyrazine crystal structure (CSD refcode: ETIDEQ) predicted using DFT PBE D3-BJ and CartNet, respectively. The green regions represent the experimental values, the red ones represent the prediction values, and the grey represents the intersection between them. The numbers in each atom represent the IoU between the experimental and the calculated ADP. Highlighted can be seen a sample ellipsoid predicted using the DFT and the same ellipsoid using CartNet. The parallelepiped represents the unit cell, and the red, green, and blue lines correspond to the a, b, and c unit cell axes.
+            </h2>
+
+          <div class="table-container"></div>
+            <table class="table is-bordered is-striped is-narrow is-fullwidth">
+                <caption class="has-text-justified">Comparative ADP results between CartNet and DFT for the 5,5'-dimethyl-2,2'-bipyrazine crystal structure (CSD refcode: ETIDEQ). DFT calculations were performed using three configurations: atomic relaxation with fixed volume (Vinet), atomic relaxation with fixed lattice, and full geometry optimization. DFT calculations used 56 CPU cores on MareNostrum 5, while CartNet used 1 GPU and 1 CPU core. Best results in <strong>bold</strong>. Arrows indicate direction of improvement.</caption>
+                <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>MAE (Å²)↓</th>
+                  <th>S₁₂ (%)↓</th>
+                  <th>IoU (%)↑</th>
+                  <th>Time (s)↓</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>DFT (Vinet)</td>
+                  <td>1.32 × 10⁻²</td>
+                  <td>3.09</td>
+                  <td>57.33</td>
+                  <td>~2.88 × 10⁶</td>
+                </tr>
+                <tr>
+                  <td>DFT (Fix Latt.)</td>
+                  <td>1.43 × 10⁻²</td>
+                  <td>4.12</td>
+                  <td>70.75</td>
+                  <td>~1.44 × 10⁶</td>
+                </tr>
+                <tr>
+                  <td>DFT (Full Opt.)</td>
+                  <td>3.25 × 10⁻³</td>
+                  <td>0.49</td>
+                  <td>86.27</td>
+                  <td>~2.88 × 10⁶</td>
+                </tr>
+                <tr>
+                  <td>CartNet</td>
+                  <td><strong>2.12 × 10⁻³</strong></td>
+                  <td><strong>0.17</strong></td>
+                  <td><strong>92.31</strong></td>
+                  <td><strong>~10⁻²</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- Results on other crystal structures datasets -->
+<section class="hero is-light">
+  <div class="hero-body">
+    <div class="container">
+      <h2 class="title is-3">Results on other Crystal Structures Datasets</h2>
+      <div class="columns is-centered">
+        <div class="column is-four-fifths">
+          <h3 class="subtitle is-5">Jarvis Dataset</h3>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-narrow is-fullwidth">
+              <caption class="has-text-justified">MAE results for the different tested architectures in test split from the Jarvis dataset. Best result in <strong>bold</strong> and second best <u>underlined</u>. Arrows indicate the direction of improvement for each metric.</caption>
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>Form. Energy (meV/atom)↓</th>
+                  <th>Band Gap(OPT) (meV)↓</th>
+                  <th>Total energy (meV/atom)↓</th>
+                  <th>Band Gap(MBJ) (meV)↓</th>
+                  <th>Ehull (meV)↓</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                    <td><a href="https://arxiv.org/pdf/2209.11807v1" target="_blank" style="color: #3273dc">Matformer</a></td>
+                  <td>32.5</td>
+                  <td>137</td>
+                  <td>35</td>
+                  <td>300</td>
+                  <td>64</td>
+                </tr>
+                <tr>
+                  <td><a href="https://arxiv.org/pdf/2306.10045v9" target="_blank" style="color: #3273dc">PotNet</a></td>
+                  <td>29.4</td>
+                  <td>127</td>
+                  <td>32</td>
+                  <td>270</td>
+                  <td>55</td>
+                </tr>
+                <tr>
+                    <td><a href="https://arxiv.org/pdf/2403.11857" target="_blank" style="color: #3273dc">eComFormer</a></td>
+                  <td>28.4</td>
+                  <td>124</td>
+                  <td>32</td>
+                  <td>280</td>
+                  <td><u>44</u></td>
+                </tr>
+                <tr>
+                  <td><a href="https://arxiv.org/pdf/2403.11857" target="_blank" style="color: #3273dc">iComFormer</a></td>
+                  <td><u>27.2</u></td>
+                  <td><u>122</u></td>
+                  <td><u>28.8</u></td>
+                  <td><u>260</u></td>
+                  <td>47</td>
+                </tr>
+                <tr>
+                  <td>CartNet</td>
+                  <td><strong>27.05 ± 0.07</strong></td>
+                  <td><strong>115.31 ± 3.36</strong></td>
+                  <td><strong>26.58 ± 0.28</strong></td>
+                  <td><strong>253.03 ± 5.20</strong></td>
+                  <td><strong>43.90 ± 0.36</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div style="height: 1cm"></div>
+
+          <h3 class="subtitle is-5">The Materials Dataset</h3>
+
+          <div class="table-container">
+            <table class="table is-bordered is-striped is-narrow is-fullwidth">
+              <caption class="has-text-justified">MAE results for the different tested architectures in test split from the Material Project Dataset. Best result in <strong>bold</strong> and second best <u>underlined</u>. Arrows indicate the direction of improvement for each metric.</caption>
+              <thead>
+                <tr>
+                  <th>Method</th>
+                  <th>Form. Energy (meV/atom)↓</th>
+                  <th>Band Gap (meV)↓</th>
+                  <th>Bulk Moduli (log(GPa))↓</th>
+                  <th>Shear Moduli (log(GPa))↓</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a href="https://arxiv.org/pdf/2209.11807v1" target="_blank" style="color: #3273dc">Matformer</a></td>
+                  <td>21</td>
+                  <td>211</td>
+                  <td>0.043</td>
+                  <td>0.073</td>
+                </tr>
+                <tr>
+                    <td><a href="https://arxiv.org/pdf/2306.10045v9" target="_blank" style="color: #3273dc">PotNet</a></td>
+                  <td>18.8</td>
+                  <td>204</td>
+                  <td>0.04</td>
+                  <td><u>0.065</u></td>
+                </tr>
+                <tr>
+                  <td><a href="https://arxiv.org/pdf/2403.11857" target="_blank" style="color: #3273dc">eComFormer</a></td>
+                  <td><u>18.16</u></td>
+                  <td>202</td>
+                  <td>0.0417</td>
+                  <td>0.0729</td>
+                </tr>
+                <tr>
+                  <td><a href="https://arxiv.org/pdf/2403.11857" target="_blank" style="color: #3273dc">iComFormer</a></td>
+                  <td>18.26</td>
+                  <td><u>193</u></td>
+                  <td><u>0.038</u></td>
+                  <td><strong>0.0637</strong></td>
+                </tr>
+                <tr>
+                  <td>CartNet</td>
+                  <td><strong>17.47 ± 0.38</strong></td>
+                  <td><strong>190.79 ± 3.14</strong></td>
+                  <td><strong>0.033 ± 0.00094</strong></td>
+                  <td><strong>0.0637 ± 0.0008</strong></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+
+<!--BibTex citation -->
+  <section class="section" id="BibTeX">
+    <div class="container is-max-desktop content">
+      <h2 class="title">BibTeX</h2>
+      <pre><code>BibTex Code Here</code></pre>
+    </div>
+</section>
+<!--End BibTex citation -->
+
+
+  <footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+
+          <p>
+            This page was built using the <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank">Academic Project Page Template</a> which was adopted from the <a href="https://nerfies.github.io" target="_blank">Nerfies</a> project page.
+            You are free to borrow the source code of this website, we just ask that you link back to this page in the footer. <br> This website is licensed under a <a rel="license"  href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative
+            Commons Attribution-ShareAlike 4.0 International License</a>.
+          </p>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Statcounter tracking code -->
+  
+<!-- You can add a tracker to track page visits by creating an account at statcounter.com -->
+
+    <!-- End of Statcounter Code -->
+
+  </body>
+  </html>
