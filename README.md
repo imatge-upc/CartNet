@@ -74,6 +74,7 @@ jarvis-tools==2024.8.30
 lightning==2.2.5
 roma==1.5.0
 e3nn==0.5.1
+csd-python-api==3.3.1
 ```
 
 These dependencies are automatically installed when you create the Conda environment using the `environment.yml` file.
@@ -85,11 +86,16 @@ These dependencies are automatically installed when you create the Conda environ
 
 The ADP (Anisotropic Displacement Parameters) dataset is curated from over 200,000 experimental crystal structures from the Cambridge Structural Database (CSD). This dataset is used to study atomic thermal vibrations represented through thermal ellipsoids. The dataset was curated to ensure high-quality and reliable ADPs. The dataset spans a wide temperature range (0K to 600K) and features a variety of atomic environments, with an average of 194.2 atoms per crystal structure. The dataset is split into 162,270 structures for training, 22,219 for validation, and 23,553 for testing.
 
-Code to create the dataset comming soon
+The dataset can be generated using the following code:
+
+```sh
+cd dataset/
+python extract_csd_data.py --output "/path/to/data/"
+```
 
 > [!NOTE]
->
-> The ADP_DATASET/ folder should be placed inside the dataset/ folder or specify the new path via --dataset_path flag in main.py
+> 
+> Dataset generation requires a valid license for the [Cambridge Structural Database (CSD) Python API](https://downloads.ccdc.cam.ac.uk/documentation/API/index.html#).
 
 ### Jarvis
 For tasks derived from Jarvis dataset, we followed the methodology of [Choudhary et al.](https://www.nature.com/articles/s41524-021-00650-1) in ALIGNN, utilizing the same training, validation, and test datasets. The dataset is automatically downloaded and processed by the code.
