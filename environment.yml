@@ -1,4 +1,4 @@
-name: CartNet
+name: CartNet_paper
 channels:
   - pyg
   - pytorch
@@ -240,12 +240,11 @@ dependencies:
   - zlib=1.2.13=h5eee18b_1
   - zlib-ng=2.2.3=h7955e40_0
   - zstd=1.5.5=hc292b87_2
+  - csd-python-api==3.3.1
   - pip:
       - ase==3.23.0
-      - csd-python-api==3.3.1
       - e3nn==0.5.1
       - opt-einsum==3.4.0
       - opt-einsum-fx==0.1.4
-      - pyclustering==0.10.1.2
       - roma==1.5.0
 prefix: /home/g1alexs/miniforge3/envs/CartNet

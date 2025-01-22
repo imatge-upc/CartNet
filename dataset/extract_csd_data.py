@@ -184,6 +184,7 @@ def worker_process(task_queue, results_queue, counter, error_event):
 
 
 if __name__ == '__main__':
+    torch.set_num_threads(10)
     parser = argparse.ArgumentParser(description='Process CSD data into graphs')
     parser.add_argument('--output', type=str, default="ADP_DATASET/data/", help='Output folder path')
     args = parser.parse_args()

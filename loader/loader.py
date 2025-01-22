@@ -20,7 +20,7 @@ def create_loader():
 
     """
     if cfg.dataset.name == "ADP":
-        refcodes = [osp.join(cfg.dataset_path,"train_files.csv"), osp.join(cfg.dataset_path,"val_files.csv"), osp.join(cfg.dataset_path,"test_files.csv")]
+        refcodes = ["dataset/csv/train_files.csv", "dataset/csv/val_files.csv", "dataset/csv/test_files.csv"]
         if cfg.model in ["icomformer", "ecomformer"]:
             assert cfg.max_neighbours is not None, "max_neighbours are needed for e/iComformer"
             cfg.dataset_path = compute_knn(cfg.max_neighbours, cfg.radius, cfg.dataset_path, refcodes)

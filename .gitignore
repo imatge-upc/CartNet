@@ -2,7 +2,6 @@
 *.pt
 *.pyc
 *.pkl
-*.csv
 results/
 wandb/
 dataset/ADP_DATASET/
