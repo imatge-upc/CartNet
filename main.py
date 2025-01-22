@@ -150,7 +150,7 @@ if __name__ == "__main__":
     parser.add_argument("--disable_envelope", action="store_false", help="Disable envelope")
     parser.add_argument('--disable_H', action='store_false', help='Hydrogens')
     parser.add_argument('--disable_atom_types', action='store_false', help='Atom types')
-    parser.add_argument("--threads", type=int, default= 8, help="Number of threads")
+    parser.add_argument("--threads", type=int, default=8, help="Number of threads")
     parser.add_argument("--workers", type=int, default=5, help="Number of workers")
     
     set_cfg(cfg)

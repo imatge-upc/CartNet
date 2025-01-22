@@ -76,7 +76,7 @@ def create_loader():
                         and not math.isnan(i[target])
                     ):
                         datalist.append(i)
-                        targets.append(i)
+                        targets.append(i[target])
             
         else:
             data = jdata(cfg.dataset.name)
