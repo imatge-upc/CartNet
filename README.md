@@ -49,8 +49,11 @@ Instructions to set up the environment:
 git clone https://github.com/imatge-upc/CartNet.git
 cd CartNet
 
-# Create a Conda environment
+# Create a Conda environment (original env)
 conda env create -f environment.yml
+
+# or alternatively, if you want to use torch 2.4.0
+conda env create -f environment_2.yml
 
 # Activate the environment
 conda activate CartNet
@@ -58,7 +61,7 @@ conda activate CartNet
 
 ## Dependencies
 
-The environment relies on these dependencies:
+The environment used for the results reported in the paper relies on these dependencies:
 
 ```sh
 pytorch==1.13.1
@@ -78,6 +81,10 @@ csd-python-api==3.3.1
 ```
 
 These dependencies are automatically installed when you create the Conda environment using the `environment.yml` file.
+
+### Update
+
+We have updated our dependencies to torch 2.4.0 to facilitate further research. This can be installed via the “environment_2.yml” file.
 
 
 ## Dataset

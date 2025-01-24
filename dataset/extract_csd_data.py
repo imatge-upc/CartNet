@@ -47,13 +47,13 @@ def refcsd2graph(refcode, output_folder):
         entry = csd_reader.entry(refcode)
 
         if entry.pressure is not None:
-            return None
+            return refcode
         
         if entry.remarks is not None:
-            return None
+            return refcode
         
         if entry.crystal.has_disorder:
-            return None
+            return refcode
         
         if entry.temperature is None:
             doc = cif.read_string(entry.to_string(format='cif'))
@@ -67,7 +67,7 @@ def refcsd2graph(refcode, output_folder):
                 assert(temperature[0] is not None)
                 temperature = float(temperature[0])
             except Exception as e:
-                return None
+                return refcode
         else:
             temperature = entry.temperature
             
@@ -75,7 +75,7 @@ def refcsd2graph(refcode, output_folder):
             try:
                 assert(len(temp)==1)
             except:
-                return None
+                return refcode
             
             temperature = float(temp[0])
         
@@ -94,7 +94,7 @@ def refcsd2graph(refcode, output_folder):
                     continue
                 elif atom.atomic_number != 1:
                     print("istrotropic")
-                    return
+                    return refcode
             
             if atom.displacement_parameters.type == "Isotropic" and atom.atomic_number == 1:
                 adp.append(torch.eye(3).unsqueeze(0)*atom.displacement_parameters.isotropic_equivalent)
@@ -192,6 +192,8 @@ if __name__ == '__main__':
     data_df = pd.read_csv('./csv/all_dataset.csv', header=None)
     
     res = [refcsd2graph(refcode, output_folder) for refcode in tqdm(data_df[0].tolist())]
-    res = [r for r in res if r is None]
-    with open("errors.txt", "w") as f:
-        f.write("\n".join(res))
+    res = [r for r in res if r is not None]
+    
+    if len(res) > 0:
+        with open("errors.txt", "w") as f:
+            f.write("\n".join(res))

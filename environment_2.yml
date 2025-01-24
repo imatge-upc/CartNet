@@ -1,4 +1,4 @@
-name: CartNet_paper
+name: CartNet_paper_2.4.0
 channels:
   - pytorch
   - pyg
