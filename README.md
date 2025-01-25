@@ -84,7 +84,7 @@ These dependencies are automatically installed when you create the Conda environ
 
 ### Update
 
-We have updated our dependencies to torch 2.4.0 to facilitate further research. This can be installed via the “environment_2.yml” file.
+We have updated our dependencies to torch 2.4.0 to facilitate further research. This can be installed via the `environment_2.yml` file.
 
 
 ## Dataset
