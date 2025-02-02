@@ -23,7 +23,7 @@ Implementation of the CartNet model proposed in the paper:
 
 - **Paper**: [Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation](https://arxiv.org/abs/2501.18369)
 - **Authors**: Àlex Solé, Albert Mosella-Montoro, Joan Cardona, Silvia Gómez-Coca, Daniel Aravena, Eliseo Ruiz and Javier Ruiz-Hidalgo
-- **Journal**: [Digital Discovery](https://www.rsc.org/journals-books-databases/about-journals/digital-discovery/), Year
+- **Journal**: [Digital Discovery](https://www.rsc.org/journals-books-databases/about-journals/digital-discovery/), 2025
 
 
 ## Table of Contents
