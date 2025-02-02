@@ -9,7 +9,7 @@
 
 <h3 align="center">
   🌐 <a href="https://imatge-upc.github.io/CartNet/" target="_blank">Project</a> | 
-  <!-- 📃 <a href="https://imatge-upc.github.io/CartNet/static/pdfs/CartNet.pdf" target="_blank">Paper</a> |  -->
+  📃 <a href="https://pubs.rsc.org/en/content/articlelanding/2024/dd/d4dd00352g" target="_blank">Paper</a> |
   🤗 <a href="https://huggingface.co/spaces/alexsoleg/cartnet-demo" target="_blank">Demo</a>
 </h3>
 
