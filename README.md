@@ -2,7 +2,8 @@
 
 ![Pipeline](./fig/frontpage.png)
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) 
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) 	
+[![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-cartesian-encoding-graph-neural-network-for/formation-energy-on-jarvis-dft-formation)](https://paperswithcode.com/sota/formation-energy-on-jarvis-dft-formation?p=a-cartesian-encoding-graph-neural-network-for) [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-cartesian-encoding-graph-neural-network-for/band-gap-on-jarvis-dft)](https://paperswithcode.com/sota/band-gap-on-jarvis-dft?p=a-cartesian-encoding-graph-neural-network-for) [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-cartesian-encoding-graph-neural-network-for/formation-energy-on-materials-project)](https://paperswithcode.com/sota/formation-energy-on-materials-project?p=a-cartesian-encoding-graph-neural-network-for) [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-cartesian-encoding-graph-neural-network-for/band-gap-on-materials-project)](https://paperswithcode.com/sota/band-gap-on-materials-project?p=a-cartesian-encoding-graph-neural-network-for)
 
 
 
