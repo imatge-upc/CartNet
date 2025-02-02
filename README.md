@@ -21,7 +21,7 @@ CartNet is specifically designed for predicting Anisotropic Displacement Paramet
 
 Implementation of the CartNet model proposed in the paper:
 
-- **Paper**: [Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation](https://imatge-upc.github.io/CartNet/static/pdfs/CartNet.pdf)
+- **Paper**: [Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation](https://arxiv.org/abs/2501.18369)
 - **Authors**: Àlex Solé, Albert Mosella-Montoro, Joan Cardona, Silvia Gómez-Coca, Daniel Aravena, Eliseo Ruiz and Javier Ruiz-Hidalgo
 - **Journal**: [Digital Discovery](https://www.rsc.org/journals-books-databases/about-journals/digital-discovery/), Year
 
@@ -228,14 +228,14 @@ Due to the presence of certain non-deterministic operations in PyTorch, as discu
 If you use this code in your research, please cite:
 
 ```bibtex
-@article{your_paper_citation,
-  title={Title of the Paper},
-  author={Author1 and Author2 and Author3},
-  journal={Journal Name},
-  year={2023},
-  volume={XX},
-  number={YY},
-  pages={ZZZ}
+@misc{solé2025cartesianencodinggraphneural,
+      title={A Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation}, 
+      author={Àlex Solé and Albert Mosella-Montoro and Joan Cardona and Silvia Gómez-Coca and Daniel Aravena and Eliseo Ruiz and Javier Ruiz-Hidalgo},
+      year={2025},
+      eprint={2501.18369},
+      archivePrefix={arXiv},
+      primaryClass={cs.LG},
+      url={https://arxiv.org/abs/2501.18369}, 
 }
 ```
 
