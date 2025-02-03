@@ -229,15 +229,15 @@ Due to the presence of certain non-deterministic operations in PyTorch, as discu
 If you use this code in your research, please cite:
 
 ```bibtex
-@misc{solé2025cartesianencodinggraphneural,
-      title={A Cartesian Encoding Graph Neural Network for Crystal Structures Property Prediction: Application to Thermal Ellipsoid Estimation}, 
-      author={Àlex Solé and Albert Mosella-Montoro and Joan Cardona and Silvia Gómez-Coca and Daniel Aravena and Eliseo Ruiz and Javier Ruiz-Hidalgo},
-      year={2025},
-      eprint={2501.18369},
-      archivePrefix={arXiv},
-      primaryClass={cs.LG},
-      url={https://arxiv.org/abs/2501.18369}, 
-}
+@Article{D4DD00352G,
+author ="Solé, Àlex and Mosella-Montoro, Albert and Cardona, Joan and Gómez-Coca, Silvia and Aravena, Daniel and Ruiz, Eliseo and Ruiz-Hidalgo, Javier",
+title  ="A Cartesian encoding graph neural network for crystal structure property prediction: application to thermal ellipsoid estimation",
+journal  ="Digital Discovery",
+year  ="2025",
+pages  ="-",
+publisher  ="RSC",
+doi  ="10.1039/D4DD00352G",
+url  ="http://dx.doi.org/10.1039/D4DD00352G",}
 ```
 
 ## License
