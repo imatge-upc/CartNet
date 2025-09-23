@@ -2,7 +2,7 @@
 
 ![Pipeline](./fig/frontpage.png)
 
-[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE) [![PWC](https://img.shields.io/endpoint.svg?url=https://paperswithcode.com/badge/a-cartesian-encoding-graph-neural-network-for/adp-prediction-on-adp-dataset)](https://paperswithcode.com/sota/adp-prediction-on-adp-dataset?p=a-cartesian-encoding-graph-neural-network-for) 	
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)	
 
 
 <h3 align="center">
